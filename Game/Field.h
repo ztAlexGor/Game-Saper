@@ -11,4 +11,5 @@ public:
 	int GetHeight();
 	int GetWidth();
 	int GetCellStatus(int x, int y);//1 - has mine, 0 - empty cell
+	~Field();
 };

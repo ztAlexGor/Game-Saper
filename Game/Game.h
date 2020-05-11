@@ -12,5 +12,8 @@ private:
 	bool solved;
 public:
 	Game(int level);
+	void newGame(int level);
+	//Game(const Game& other);
 	virtual void draw(RenderTarget& target, RenderStates states)const;
+	~Game();
 };

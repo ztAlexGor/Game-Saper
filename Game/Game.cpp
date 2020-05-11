@@ -1,6 +1,6 @@
 #include "Game.h"
 
-Game::Game(int level): level(level){
+Game::Game(int level): level(level){//constructor
 	if (level == 1) {
 		pole = new Field{ 10, 8, 10 };//Easy level
 	}
@@ -16,22 +16,49 @@ Game::Game(int level): level(level){
 	}*/
 }
 
+void Game::newGame(int level){
+	delete pole;
+	if (level == 1) {
+		pole = new Field{ 10, 8, 10 };//Easy level
+	}
+	else if (level == 2) {
+		pole = new Field{ 13, 20, 40 };//Medium level
+	}
+	else if (level == 3) {
+		pole = new Field{ 33, 20, 100 };//Hard level
+	}
+}
+
+//Game::Game(const Game& other){//copy constructor
+//	this->level = other.level;
+//	this->solved = other.solved;
+//	if (level == 1) {
+//		pole = new Field{ 10, 8, 10 };//Easy level
+//	}
+//	else if (level == 2) {
+//		pole = new Field{ 13, 20, 40 };//Medium level
+//	}
+//	else if (level == 3) {
+//		pole = new Field{ 33, 20, 100 };//Hard level
+//	}
+//}
+
 void Game::draw(RenderTarget& target, RenderStates states) const{
 	states.transform *= getTransform();
 	Color color = Color(200, 100, 200);
 
 	// Рисуем рамку игрового поля
-	RectangleShape shape(Vector2f(pole->GetHeight() * 20 + 20.f, pole->GetWidth() * 20 + 20.f));
+	RectangleShape shape(Vector2f(pole->GetHeight() * Cell::size + 20.f, pole->GetWidth() * Cell::size + 20.f));
 	shape.setOutlineThickness(2.f);
 	shape.setOutlineColor(color);
 	shape.setFillColor(Color::Transparent);
 	target.draw(shape, states);
 
 	// Подготавливаем рамку для отрисовки всех плашек
-	shape.setSize(sf::Vector2f(Cell::size - 2, Cell::size - 2));
+	shape.setSize(Vector2f(Cell::size - 2, Cell::size - 2));
 	shape.setOutlineThickness(2.f);
 	shape.setOutlineColor(color);
-	shape.setFillColor(sf::Color::Transparent);
+	shape.setFillColor(Color::Transparent);
 
 	// Подготавливаем текстовую заготовку для отрисовки номеров плашек
 	Text text;// ("", font, 52);
@@ -64,4 +91,8 @@ void Game::draw(RenderTarget& target, RenderStates states) const{
 			target.draw(text, states);
 		}
 	}
+}
+
+Game::~Game(){
+	delete pole;
 }
