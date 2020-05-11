@@ -1,14 +1,16 @@
-#include <SFML/Graphics.hpp>
-#include <iostream>
+#include "Header.h"
 
 using namespace sf;
 using namespace std;
 
 int main()
 {
-    RenderWindow window(VideoMode(1000, 1000), "MineSweeper");
-    CircleShape shape(200.f);
-    shape.setFillColor(Color::Magenta);
+    RenderWindow window(VideoMode(500, 400), "MineSweeper");
+    /*CircleShape shape(200.f);
+    shape.setFillColor(Color::Magenta);*/
+
+    Game game(1);
+    game.setPosition(50.f, 50.f);
 
     while (window.isOpen())
     {
@@ -20,9 +22,10 @@ int main()
         }
 
         window.clear();
-        window.draw(shape);
+        window.draw(game);
         window.display();
     }
 
     return 0;
 }
+//33*20
