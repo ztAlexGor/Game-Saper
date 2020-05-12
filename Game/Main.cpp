@@ -14,7 +14,7 @@ int main()
 
     Clock clock;
     float time;
-
+    int level = 1;
     while (window.isOpen())
     {
         Event event;
@@ -25,17 +25,20 @@ int main()
         }
 
         if (event.type == event.KeyReleased) {
-            if (event.key.code == Keyboard::F2) {
+            if (event.key.code == Keyboard::F2 && level != 1) {
                 window.create(VideoMode(274, 264), "MineSweeper", Style::Close);
                 game.newGame(1);
+                level = 1;
             }
-            else if (event.key.code == Keyboard::F3) {
+            else if (event.key.code == Keyboard::F3 && level != 2) {
                 window.create(VideoMode(524, 389), "MineSweeper", Style::Close);
                 game.newGame(2);
+                level = 2;
             }
-            else if (event.key.code == Keyboard::F4) {
+            else if (event.key.code == Keyboard::F4 && level != 3) {
                 window.create(VideoMode(849, 564), "MineSweeper", Style::Close);
                 game.newGame(3);
+                level = 3;
             }
         }
         else if (event.type == event.MouseButtonReleased) {

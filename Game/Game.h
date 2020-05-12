@@ -16,5 +16,6 @@ public:
 	//Game(const Game& other);
 	virtual void draw(RenderTarget& target, RenderStates states)const;
 	void OpenCell(int x, int y);
+	int GetLevel();
 	~Game();
 };

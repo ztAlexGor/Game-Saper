@@ -124,6 +124,10 @@ void Game::OpenCell(int x, int y){
 	pole->Open(x, y);
 }
 
+int Game::GetLevel(){
+	return level;
+}
+
 Game::~Game(){
 	delete pole;
 }
