@@ -1,13 +1,5 @@
 #include "Cell.h"
 
-
-
-Mine::Mine() {
-	is_open = 0;
-}
-
-
-
-Empty::Empty() {
+Cell::Cell(int number):number(number){
 	is_open = 0;
 }

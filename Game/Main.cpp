@@ -5,10 +5,10 @@ using namespace std;
 
 int main()
 {
-    RenderWindow window(VideoMode(274, 224), "MineSweeper", Style::Close);
+    RenderWindow window(VideoMode(274, 264), "MineSweeper", Style::Close);
     /*CircleShape shape(200.f);
     shape.setFillColor(Color::Magenta);*/
-
+    
     Game game = Game(1);
     game.setPosition(2.f, 2.f);
 
@@ -26,16 +26,28 @@ int main()
 
         if (event.type == event.KeyReleased) {
             if (event.key.code == Keyboard::F2) {
-                window.create(VideoMode(274, 224), "MineSweeper", Style::Close);
+                window.create(VideoMode(274, 264), "MineSweeper", Style::Close);
                 game.newGame(1);
             }
             else if (event.key.code == Keyboard::F3) {
-                window.create(VideoMode(349, 524), "MineSweeper", Style::Close);
+                window.create(VideoMode(524, 389), "MineSweeper", Style::Close);
                 game.newGame(2);
             }
             else if (event.key.code == Keyboard::F4) {
-                window.create(VideoMode(849, 524), "MineSweeper", Style::Close);
+                window.create(VideoMode(849, 564), "MineSweeper", Style::Close);
                 game.newGame(3);
+            }
+        }
+        else if (event.type == event.MouseButtonReleased) {
+            if (event.key.code == Mouse::Left) {
+                Vector2i localPosition = sf::Mouse::getPosition(window);
+                int px = (localPosition.x - 11) / Cell::size;
+                int py = (localPosition.y - 52) / Cell::size;
+                //if (px>0 && px<game.)
+                game.OpenCell(py, px);
+            }
+            else if (event.key.code == Mouse::Right) {
+                Vector2i localPosition = sf::Mouse::getPosition(window);
             }
         }
 
