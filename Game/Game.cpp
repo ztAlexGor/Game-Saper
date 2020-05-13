@@ -13,8 +13,8 @@ Game::Game(int level) : level(level) {//constructor
         pole = new Field{ 20, 33, 100 };//Hard level
     }
 
-    countOfMarkes = pole->GetMinesCount;
-    ClosedCells = (pole->GetHeight * pole->GetWidth) - countOfMarkes;
+    countOfMarkes = pole->GetMinesCount();
+    ClosedCells = (pole->GetHeight() * pole->GetWidth()) - countOfMarkes;
     /*else if (level == 4) {
       pole = new Field{ ,  , };//Custome level
     }*/
@@ -31,8 +31,8 @@ void Game::newGame(int level) {
     else if (level == 3) {
         pole = new Field{ 20, 33, 100 };//Hard level
     }
-    countOfMarkes = pole->GetMinesCount;
-    ClosedCells = (pole->GetHeight * pole->GetWidth) - countOfMarkes;
+    countOfMarkes = pole->GetMinesCount();
+    ClosedCells = (pole->GetHeight() * pole->GetWidth()) - countOfMarkes;
 }
 
 //Game::Game(const Game& other){//copy constructor
@@ -51,7 +51,7 @@ void Game::newGame(int level) {
 
 void Game::draw(RenderTarget& target, RenderStates states) const {
     states.transform *= getTransform();
-    Color color = Color(200, 100, 200);
+    Color color = Color(127, 127, 127);
 
     // Рисуем меню игрового поля
     RectangleShape shape(Vector2f(pole->GetWidth() * Cell::size + 20.f, 40.f));
@@ -78,39 +78,38 @@ void Game::draw(RenderTarget& target, RenderStates states) const {
     Text text("", font, 18);
     text.setStyle(Text::Bold);
 
-    Texture NotOpenCellTexture;
+    Texture Texture;
+    Texture.loadFromFile("Images/Cell.png");
     Sprite Cell;
+    Cell.setTexture(Texture);
 
     for (unsigned int i = 0; i < pole->GetHeight(); i++) {
         for (unsigned int j = 0; j < pole->GetWidth(); j++) {
             text.setString("");
             if (pole->GetCellStatus(i, j) == 0) {// Не открытая клеточка
-                NotOpenCellTexture.loadFromFile("Images/Kletka.png");
-                Cell.setTexture(NotOpenCellTexture);
-
-                text.setFillColor(Color::Blue);
-                text.setString(std::to_string(pole->GetCellNumber(i, j)));
-                if (pole->GetCellNumber(i, j) == 9)text.setFillColor(Color::Black);
-                if (pole->GetCellNumber(i, j) == 0)text.setString("");
+                Cell.setTextureRect(sf::IntRect(0, 0, 25, 25));
+                text.setFillColor(color);
+                int count = pole->GetCellNumber(i, j);
+                if (count == 9) {
+                    text.setFillColor(Color::Black);
+                    text.setString(std::to_string(count));
+                }
+                else if (count == 0)text.setString("");
+                else text.setString(std::to_string(count));
             }
             else if (pole->GetCellStatus(i, j) == 1) {//Уже открытая клеточка
-                NotOpenCellTexture.loadFromFile("Images/Kletka.png");
-                Cell.setTexture(NotOpenCellTexture);
-                text.setFillColor(Color::Magenta);
-                text.setString(std::to_string(pole->GetCellNumber(i, j)));
-                if (pole->GetCellNumber(i, j) == 0)text.setString("");
+                Cell.setTextureRect(sf::IntRect(25, 0, 25, 25));
+                text.setFillColor(Color::Blue);
+                int count = pole->GetCellNumber(i, j);
+                if (count == 9)text.setFillColor(Color::Black);
+                else if (count == 0)text.setString("");
+                else text.setString(std::to_string(count));
             }
             else if (pole->GetCellStatus(i, j) == 2) {//Клеточка помечена как заминированная
-                NotOpenCellTexture.loadFromFile("Images/Kletka.png");
-                Cell.setTexture(NotOpenCellTexture);
-                text.setFillColor(Color::Red);
-                text.setString("1");
+                Cell.setTextureRect(sf::IntRect(50, 0, 25, 25));
             }
             else if (pole->GetCellStatus(i, j) == 3) {//Мина взорвана
-                NotOpenCellTexture.loadFromFile("Images/Kletka.png");
-                Cell.setTexture(NotOpenCellTexture);
-                text.setFillColor(Color::Black);
-                text.setString("");
+                Cell.setTextureRect(sf::IntRect(12, 0, 25, 25));
             }
 
             // Вычисление позиции клеточки для отрисовки
@@ -138,12 +137,20 @@ Game::~Game() {
 }
 
 void Game::SetSelfStatus(int x, int y) {
-    pole->SetSelfStatus(x, y);
+
+    if (countOfMarkes == 0 && pole->GetCellStatus(x, y) == 2) {
+        pole->SetSelfStatus(x, y);
+        countOfMarkes--;
+        return;
+    }
+    int a = pole->SetSelfStatus(x, y);
+    if (a == 0)
+        countOfMarkes++;
+    else
+        if (a == 1)
+            countOfMarkes++;
 }
 
-void Game::DeCrement() {
-    countOfMarkes--;
-}
 
 int Game::getCountOfMarks()
 {

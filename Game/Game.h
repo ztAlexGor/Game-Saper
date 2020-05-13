@@ -21,7 +21,6 @@ public:
     void OpenCell(int x, int y);
     int GetLevel();
     void SetSelfStatus(int x, int y);
-    void DeCrement();
     int getCountOfMarks();
     ~Game();
 };
