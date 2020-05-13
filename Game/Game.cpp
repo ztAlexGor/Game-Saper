@@ -1,6 +1,8 @@
 #include "Game.h"
 
 Game::Game(int level): level(level){//constructor
+	font.loadFromFile("Fonts/Calibri.ttf");
+
 	if (level == 1) {
 		pole = new Field{ 8, 10, 10 };//Easy level
 	}
@@ -12,7 +14,7 @@ Game::Game(int level): level(level){//constructor
 	}
 
 	/*else if (level == 4) {
-		pole = new Field{ ,  , };//Hard level
+		pole = new Field{ ,  , };//Custome level
 	}*/
 }
 
@@ -45,7 +47,7 @@ void Game::newGame(int level){
 
 void Game::draw(RenderTarget& target, RenderStates states) const{
 	states.transform *= getTransform();
-	Color color = Color(200, 100, 200);
+	Color color = Color(127, 127, 127);
 
 	// Рисуем меню игрового поля
 	RectangleShape shape(Vector2f(pole->GetWidth() * Cell::size + 20.f, 40.f));
@@ -61,60 +63,58 @@ void Game::draw(RenderTarget& target, RenderStates states) const{
 	shape.setFillColor(Color::Transparent);
 	target.draw(shape, states);
 
-	// Подготавливаем рамку для отрисовки всех клеточек
-	shape.setSize(Vector2f(Cell::size - 2, Cell::size - 2));
-	shape.setOutlineThickness(2.f);
-	shape.setOutlineColor(color);
-	shape.setFillColor(Color::Transparent);
+	//// Подготавливаем рамку для отрисовки всех клеточек
+	//shape.setSize(Vector2f(Cell::size - 2, Cell::size - 2));
+	//shape.setOutlineThickness(2.f);
+	//shape.setOutlineColor(color);
+	//shape.setFillColor(Color::Transparent);
 
 	// Подготавливаем текстовую заготовку для отрисовки чисел в клеточках
-	Font font;
-	font.loadFromFile("Fonts/Calibri.ttf");
-	Text text("1", font, 18);
+	
+	Text text("", font, 18);
 	text.setStyle(Text::Bold);
 
-	Texture NotOpenCellTexture;
-	Sprite NotOpenCell;
+	Texture Texture;
+	Texture.loadFromFile("Images/Cell.png");
+	Sprite Cell;
+	Cell.setTexture(Texture);
 
 	for (unsigned int i = 0; i < pole->GetHeight(); i++){
 		for (unsigned int j = 0; j < pole->GetWidth(); j++){
 			text.setString("");
 			if (pole->GetCellStatus(i, j) == 0){// Не открытая клеточка
-				NotOpenCellTexture.loadFromFile("Images/Kletka.png");
-				NotOpenCell.setTexture(NotOpenCellTexture);
-				text.setFillColor(Color::Blue);
-				text.setString(std::to_string(pole->GetCellNumber(i, j)));
-				if (pole->GetCellNumber(i, j)==9)text.setFillColor(Color::Black);
-				if (pole->GetCellNumber(i, j) == 0)text.setString("");
+				Cell.setTextureRect(sf::IntRect(0, 0, 25, 25));
+				text.setFillColor(color);
+				int count = pole->GetCellNumber(i, j);
+				if (count == 9) {
+					text.setFillColor(Color::Black);
+					text.setString(std::to_string(count));
+				}
+				else if (count == 0)text.setString("");
+				else text.setString(std::to_string(count));
 			}
 			else if (pole->GetCellStatus(i, j) == 1){//Уже открытая клеточка
-				NotOpenCellTexture.loadFromFile("Images/Kletka.png");
-				NotOpenCell.setTexture(NotOpenCellTexture);
-				text.setFillColor(Color::Magenta);
-				text.setString(std::to_string(pole->GetCellNumber(i, j)));
-				if (pole->GetCellNumber(i, j) == 0)text.setString("");
+				Cell.setTextureRect(sf::IntRect(25, 0, 25, 25));
+				text.setFillColor(Color::Blue);
+				int count = pole->GetCellNumber(i, j);
+				if (count == 9)text.setFillColor(Color::Black);
+				else if (count == 0)text.setString("");
+				else text.setString(std::to_string(count));
 			}
 			else if (pole->GetCellStatus(i, j) == 2) {//Клеточка помечена как заминированная
-				NotOpenCellTexture.loadFromFile("Images/Kletka.png");
-				NotOpenCell.setTexture(NotOpenCellTexture);
-				text.setFillColor(Color::Red);
-				text.setString("1");
+				Cell.setTextureRect(sf::IntRect(50, 0, 25, 25));
 			}
 			else if (pole->GetCellStatus(i, j) == 3) {//Мина взорвана
-				NotOpenCellTexture.loadFromFile("Images/Kletka.png");
-				NotOpenCell.setTexture(NotOpenCellTexture);
-				text.setFillColor(Color::Black);
-				text.setString("");
+				Cell.setTextureRect(sf::IntRect(12, 0, 25, 25));
 			}
 
 			// Вычисление позиции клеточки для отрисовки
 			Vector2f position(j * Cell::size + 11.f, i * Cell::size + 52.f);
 			Vector2f textPosition(j * Cell::size + 15.f, i * Cell::size + 50.f);
-			shape.setPosition(position);
+			
 			text.setPosition(textPosition);
-			NotOpenCell.setPosition(position);
-			target.draw(NotOpenCell);
-			//target.draw(shape, states);
+			Cell.setPosition(position);
+			target.draw(Cell);
 			target.draw(text, states);
 		}
 	}

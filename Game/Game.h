@@ -7,6 +7,7 @@ using namespace sf;
 
 class Game : public sf::Drawable, public sf::Transformable {
 private:
+	Font font;
 	int level;//easy, medium, hard, custome
 	Field *pole;
 	bool solved;
