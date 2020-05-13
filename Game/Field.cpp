@@ -87,9 +87,19 @@ int Field::CalculateMines(int x, int y) {
 	return count;
 }
 
-void Field::SetSelfStatus(int x, int y) {
-	cells[x][y]->is_open = 2;
+int Field::SetSelfStatus(int x, int y) {
+	if (x < 0 || x >= height || y < 0 || y >= width) return -1;
+	if (cells[x][y]->is_open == 2) {
+		cells[x][y]->is_open = 0;
+		return 0;
+	}
+	else
+		if (cells[x][y]->is_open == 0) {
+			cells[x][y]->is_open = 2;
+			return 1;
+		}
+	return 2;
 }
-int GetMinesCount() {
-	return GetMinesCount();
+int Field::GetMinesCount() {
+	return countOfMines;
 }
