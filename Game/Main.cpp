@@ -50,7 +50,13 @@ int main()
                 game.OpenCell(py, px);
             }
             else if (event.key.code == Mouse::Right) {
-                Vector2i localPosition = sf::Mouse::getPosition(window);
+                if (game.getCountOfMarks() == 0) {
+                    Vector2i localPosition = sf::Mouse::getPosition(window);
+                    int px = (localPosition.x - 11) / Cell::size;
+                    int py = (localPosition.y - 52) / Cell::size;
+                    game.SetSelfStatus(px, py);
+                    game.DeCrement();
+                }
             }
         }
 

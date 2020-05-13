@@ -86,3 +86,10 @@ int Field::CalculateMines(int x, int y) {
 	if (x < height - 1 && y < width -1 && cells[x + 1][y + 1]->number == 9)count++;
 	return count;
 }
+
+void Field::SetSelfStatus(int x, int y) {
+	cells[x][y]->is_open = 2;
+}
+int GetMinesCount() {
+	return GetMinesCount();
+}
