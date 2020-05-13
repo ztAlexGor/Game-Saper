@@ -4,20 +4,23 @@
 
 
 
-void Field::Open(int x, int y){
-	if (x < 0 || x >= height || y < 0 || y >= width)return;
-	if (cells[x][y]->is_open == 1)return;
-	cells[x][y]->is_open = 1;
-	if (cells[x][y]->number > 0 && cells[x][y]->number < 9)return;
+int Field::Open(int x, int y){
+	if (x < 0 || x >= height || y < 0 || y >= width)return 0;
+	if (cells[x][y]->is_open == 1)return 0;
 
-	if (x > 0 && y > 0)Open(x - 1, y - 1);
-	if (x > 0)Open(x - 1, y);
-	if (x > 0 && y < width - 1)Open(x - 1, y + 1);
-	if (y > 0)Open(x, y - 1);
-	if (y < width - 1 )Open(x, y + 1);
-	if (x < height - 1 && y > 0)Open(x + 1, y - 1);
-	if (x < height - 1)Open(x + 1, y);
-	if (x < height - 1 && y < width - 1)Open(x + 1, y + 1);
+	cells[x][y]->is_open = 1;
+	int col = 1;
+	if (cells[x][y]->number > 0 && cells[x][y]->number < 9)return col;
+
+	if (x > 0 && y > 0)col += Open(x - 1, y - 1);
+	if (x > 0)col += Open(x - 1, y);
+	if (x > 0 && y < width - 1)col += Open(x - 1, y + 1);
+	if (y > 0)col += Open(x, y - 1);
+	if (y < width - 1 )col += Open(x, y + 1);
+	if (x < height - 1 && y > 0)col += Open(x + 1, y - 1);
+	if (x < height - 1)col += Open(x + 1, y);
+	if (x < height - 1 && y < width - 1)col += Open(x + 1, y + 1);
+	return col;
 }
 
 
@@ -102,4 +105,26 @@ int Field::SetSelfStatus(int x, int y) {
 }
 int Field::GetMinesCount() {
 	return countOfMines;
+}
+
+void Field::win(){
+	for (int i = 0; i < height; i++) {
+		for (int j = 0; j < width; j++) {
+			if (cells[i][j]->number == 9) {
+				cells[i][j]->is_open = 2;
+			}
+		}
+	}
+}
+
+void Field::fail(int x, int y){
+	if (x < 0 || x >= height || y < 0 || y >= width) return;
+	cells[x][y]->is_open = 3;
+	for (int i = 0; i < height; i++) {
+		for (int j = 0; j < width; j++) {
+			if (cells[i][j]->number != 9){
+				cells[i][j]->is_open = 1;
+			}
+		}
+	}
 }

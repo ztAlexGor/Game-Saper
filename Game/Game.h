@@ -11,6 +11,7 @@ private:
     int level;//easy, medium, hard, custome
     Field* pole;
     bool solved;
+    bool lose;
     int countOfMarkes;
     int ClosedCells;
 public:
@@ -22,5 +23,8 @@ public:
     int GetLevel();
     void SetSelfStatus(int x, int y);
     int getCountOfMarks();
+    void win();
+    void losing(int reason);//reason = 0 if player open the bomd and 1 if all time is waste
+    bool stop();
     ~Game();
 };
