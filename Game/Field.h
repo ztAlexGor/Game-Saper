@@ -9,7 +9,7 @@ class Field {
 
 	int CalculateMines(int x, int y);
 public:
-	void SetSelfStatus(int x, int y);
+	int SetSelfStatus(int x, int y);
 	void Open(int x, int y);
 	Field(int h, int w, int countOfMines);
 	int GetHeight();
