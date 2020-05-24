@@ -19,5 +19,6 @@ public:
 	int GetMinesCount();
 	void win();
 	void fail(int x, int y);
+	bool DeleteMine(int x, int y);
 	~Field();
 };

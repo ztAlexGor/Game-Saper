@@ -8,10 +8,12 @@ using namespace sf;
 class Game : public sf::Drawable, public sf::Transformable {
 private:
     Font font;
+    Texture Texture;
     int level;//easy, medium, hard, custome
     Field* pole;
     bool solved;
     bool lose;
+    bool isGameRun;
     int countOfMarkes;
     int ClosedCells;
 public:
@@ -25,6 +27,7 @@ public:
     int getCountOfMarks();
     void win();
     void losing(int reason);//reason = 0 if player open the bomd and 1 if all time is waste
+    bool GetIsGameRun();
     bool stop();
     ~Game();
 };

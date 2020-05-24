@@ -2,8 +2,10 @@
 
 Game::Game(int level) : level(level) {//constructor
     font.loadFromFile("Fonts/Calibri.ttf");
+    Texture.loadFromFile("Images/Cell.png");
     solved = false;
     lose = false;
+    isGameRun = false;
 
     if (level == 1) {
         pole = new Field{ 8, 10, 10 };//Easy level
@@ -25,12 +27,13 @@ Game::Game(int level) : level(level) {//constructor
 void Game::newGame(int level) {
     solved = false;
     lose = false;
+    isGameRun = false;
     delete pole;
     if (level == 1) {
         pole = new Field{ 8, 10, 10 };//Easy level
     }
     else if (level == 2) {
-        pole = new Field{ 13, 20, 40 };//Medium level
+        pole = new Field{ 13, 20, 40 };//Medium level   
     }
     else if (level == 3) {
         pole = new Field{ 20, 33, 100 };//Hard level
@@ -57,19 +60,26 @@ void Game::draw(RenderTarget& target, RenderStates states) const {
     states.transform *= getTransform();
     Color color = Color(127, 127, 127);
 
-    // Рисуем меню игрового поля
-    RectangleShape shape(Vector2f(pole->GetWidth() * Cell::size + 20.f, 40.f));
-    shape.setOutlineThickness(2.f);
-    shape.setOutlineColor(color);
-    shape.setFillColor(Color::Transparent);
-    target.draw(shape, states);
 
     // Рисуем рамку игрового поля
-    shape.setSize(Vector2f(pole->GetWidth() * Cell::size + 20.f, pole->GetHeight() * Cell::size + 60.f));
+   /* RectangleShape shape(Vector2f(pole->GetWidth() * Cell::size, pole->GetHeight() * Cell::size + 50.f));
+    shape.setOutlineThickness(2.f);
+    shape.setOutlineColor(color);
+    shape.setFillColor(Color(139, 250, 131));
+    target.draw(shape, states);*/
+
+    // Рисуем меню игрового поля
+    /*shape.setSize(Vector2f(pole->GetWidth() * Cell::size, 40.f));
     shape.setOutlineThickness(2.f);
     shape.setOutlineColor(color);
     shape.setFillColor(Color::Transparent);
-    target.draw(shape, states);
+    target.draw(shape, states);*/
+
+   /* shape.setSize(Vector2f(pole->GetWidth() * Cell::size - 2, pole->GetHeight() * Cell::size - 2));
+    shape.setPosition(Vector2f(10, 50));
+    shape.setOutlineThickness(6.f);
+    shape.setOutlineColor(Color(70, 70, 70));
+    target.draw(shape, states);*/
 
     //// Подготавливаем рамку для отрисовки всех клеточек
     //shape.setSize(Vector2f(Cell::size - 2, Cell::size - 2));
@@ -83,12 +93,11 @@ void Game::draw(RenderTarget& target, RenderStates states) const {
     text.setStyle(Text::Bold);
 
     text.setString(std::to_string(countOfMarkes));
-    text.setPosition(Vector2f(15, 10));
-    text.setFillColor(Color::Yellow);
+    text.setPosition(Vector2f(65, 36));
+    text.setFillColor(Color::Red);
     target.draw(text);
 
-    Texture Texture;
-    Texture.loadFromFile("Images/Cell.png");
+    
     Sprite Cell;
     Cell.setTexture(Texture);
 
@@ -128,8 +137,8 @@ void Game::draw(RenderTarget& target, RenderStates states) const {
             }
 
             // Вычисление позиции клеточки для отрисовки
-            Vector2f position(j * Cell::size + 11.f, i * Cell::size + 52.f);
-            Vector2f textPosition(j * Cell::size + 15.f, i * Cell::size + 50.f);
+            Vector2f position(j * Cell::size + 10, i * Cell::size + 81.f);
+            Vector2f textPosition(j * Cell::size + 17.f, i * Cell::size + 81.f);
 
             text.setPosition(textPosition);
             Cell.setPosition(position);
@@ -140,14 +149,14 @@ void Game::draw(RenderTarget& target, RenderStates states) const {
     if (solved) {
         Text winText("YOU WON!!!", font, 50);
         winText.setStyle(Text::Bold);
-        winText.setPosition(Vector2f(pole->GetWidth() * Cell::size / 2 - 110, pole->GetHeight() * Cell::size / 2 + 30));
+        winText.setPosition(Vector2f(pole->GetWidth() * Cell::size / 2 - 110, pole->GetHeight() * Cell::size / 2 + 56));
         winText.setFillColor(Color(22, 114, 50));
         target.draw(winText);
     }
     else if (lose) {
         Text loseText("YOU LOSE :(", font, 40);
         loseText.setStyle(Text::Bold);
-        loseText.setPosition(Vector2f(pole->GetWidth() * Cell::size / 2 - 80, pole->GetHeight() * Cell::size / 2 + 30));
+        loseText.setPosition(Vector2f(pole->GetWidth() * Cell::size / 2 - 80, pole->GetHeight() * Cell::size / 2 + 56));
         loseText.setFillColor(Color(255, 0, 0));
         target.draw(loseText);
     }
@@ -156,10 +165,16 @@ void Game::draw(RenderTarget& target, RenderStates states) const {
 void Game::OpenCell(int x, int y) {
     if (pole->GetCellStatus(x, y) == 2)return;
     if (pole->GetCellNumber(x, y) == 9) {
-        pole->fail(x, y);
-        losing(0);
-        return;
+        if (ClosedCells == pole->GetHeight() * pole->GetWidth()) {
+            if (!pole->DeleteMine(x, y))return;
+        }
+        else {
+            pole->fail(x, y);
+            losing(0);
+            return;
+        }
     }
+    isGameRun = true;
     ClosedCells -= pole->Open(x, y);
     if (ClosedCells == pole->GetMinesCount())win();
 }
@@ -195,15 +210,21 @@ int Game::getCountOfMarks(){
 
 void Game::win(){
     solved = true;
+    isGameRun = false;
     pole->win();
     countOfMarkes = 0;
 }
 
 void Game::losing(int reason){
+    isGameRun = false;
     lose = true;
 }
 
-bool Game::stop(){
+bool Game::GetIsGameRun(){
+    return isGameRun;
+}
+
+bool Game::stop() {
     if (solved || lose)return true;
     else return false;
 }

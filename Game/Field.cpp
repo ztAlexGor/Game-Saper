@@ -60,10 +60,12 @@ int Field::GetWidth(){
 }
 
 int Field::GetCellStatus(int x, int y){
+	if (x < 0 || x >= height || y < 0 || y >= width)return -1;
 	return cells[x][y]->is_open;
 }
 
 int Field::GetCellNumber(int x, int y){
+	if (x < 0 || x >= height || y < 0 || y >= width)return -1;
 	return cells[x][y]->number;
 }
 
@@ -127,4 +129,42 @@ void Field::fail(int x, int y){
 			}
 		}
 	}
+}
+
+bool Field::DeleteMine(int x, int y){
+	if (x < 0 || x >= height || y < 0 || y >= width) return false;
+	bool u = true;
+	int i;
+	int j;
+	while (u){
+		i = rand() % height;
+		j = rand() % width;
+		if (cells[i][j]->number != 9) {
+			cells[i][j]->number = 9;
+			u = false;
+		}
+	}
+	cells[x][y]->number = CalculateMines(x, y);
+	{
+		if (x > 0 && y > 0 && cells[x - 1][y - 1]->number != 9)cells[x - 1][y - 1]->number--;
+		if (x > 0 && cells[x - 1][y]->number != 9)cells[x - 1][y]->number--;
+		if (x > 0 && y < width - 1 && cells[x - 1][y + 1]->number != 9)cells[x - 1][y + 1]->number--;
+		if (y > 0 && cells[x][y - 1]->number != 9)cells[x][y - 1]->number--;
+		if (y < width - 1 && cells[x][y + 1]->number != 9)cells[x][y + 1]->number--;
+		if (x < height - 1 && y > 0 && cells[x + 1][y - 1]->number != 9)cells[x + 1][y - 1]->number--;
+		if (x < height - 1 && cells[x + 1][y]->number != 9)cells[x + 1][y]->number--;
+		if (x < height - 1 && y < width - 1 && cells[x + 1][y + 1]->number != 9)cells[x + 1][y + 1]->number--;
+	}
+	x = i; y = j;
+	{
+		if (x > 0 && y > 0 && cells[x - 1][y - 1]->number != 9)cells[x - 1][y - 1]->number++;
+		if (x > 0 && cells[x - 1][y]->number != 9)cells[x - 1][y]->number++;
+		if (x > 0 && y < width - 1 && cells[x - 1][y + 1]->number != 9)cells[x - 1][y + 1]->number++;
+		if (y > 0 && cells[x][y - 1]->number != 9)cells[x][y - 1]->number++;
+		if (y < width - 1 && cells[x][y + 1]->number != 9)cells[x][y + 1]->number++;
+		if (x < height - 1 && y > 0 && cells[x + 1][y - 1]->number != 9)cells[x + 1][y - 1]->number++;
+		if (x < height - 1 && cells[x + 1][y]->number != 9)cells[x + 1][y]->number++;
+		if (x < height - 1 && y < width - 1 && cells[x + 1][y + 1]->number != 9)cells[x + 1][y + 1]->number++;
+	}
+	return true;
 }
