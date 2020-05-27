@@ -2,20 +2,16 @@
 
 Interface::Interface(){
 	subMenuIm.loadFromFile("Images/subMenu.Gif");
-	DDMenuIm.loadFromFile("Images/DDMenu.png");
 	CountersIm.loadFromFile("Images/Counters.Gif");
-    isDDMenu = false;
+    subMenuStatus = 0;
+    subMenuStatus = 0;
 }
 
 void Interface::draw(RenderTarget& target, RenderStates states) const{
     Sprite subMenu;
     subMenu.setTexture(subMenuIm);
-    subMenu.setTextureRect(sf::IntRect(0, 0, 98, 25));
+    subMenu.setTextureRect(sf::IntRect(0, subMenuStatus * 25, 98, 25));
     //subMenu.setPosition(0, 0);
-
-    Sprite DDMenu;//Drop down menu
-    DDMenu.setTexture(DDMenuIm);
-    DDMenu.setPosition(10, 25);
 
     RectangleShape lineMenu(Vector2f(target.getSize().x, 25));
     lineMenu.setFillColor(Color(240, 240, 240));
@@ -29,28 +25,26 @@ void Interface::draw(RenderTarget& target, RenderStates states) const{
 
     Sprite Counters;
     Counters.setTexture(CountersIm);
-    Counters.setPosition(31, 25);
+    Counters.setPosition(20, 31);
+    Counters.setTextureRect(IntRect(0, 0, 80, 33));
 
-
-    lineMenu.setSize(Vector2f(target.getSize().x, 25));
-    fon.setSize(Vector2f(target.getSize().x, target.getSize().y));
-    underMenuLine.setPosition(0, 25);
-    underMenuLine.setSize(Vector2f(target.getSize().x, 1));
-    Counters.setTextureRect(sf::IntRect(0, 0, 80, 33));
-    Counters.setPosition(25, 31);
 
     target.draw(fon);
-    target.draw(subMenu);
-    target.draw(Counters);
-    Counters.setTextureRect(sf::IntRect(80, 0, 80, 33));
-    Counters.setPosition(target.getSize().x - 90, 31);
-    target.draw(Counters);
     target.draw(lineMenu);
+    target.draw(Counters);
+    Counters.setTextureRect(IntRect(80, 0, 80, 33));
+    Counters.setPosition(target.getSize().x - 100, 31);
+    target.draw(Counters);
+    target.draw(subMenu);
     target.draw(underMenuLine);
     underMenuLine.setPosition(0, 71);
     target.draw(underMenuLine);
+}
 
-    if (isDDMenu) {
-        target.draw(DDMenu);
-    }
+void Interface::setSubMenuStatus(int x, int y){
+    if (y >= 0 && y <= 25) {
+        if (x >= 0 && x <= 41)subMenuStatus = 1;
+        else if (x >= 42 && x <= 98)subMenuStatus = 2;
+        else subMenuStatus = 0;
+    }else subMenuStatus = 0;
 }

@@ -3,28 +3,25 @@
 using namespace std;
 
 int Menu(RenderWindow& window, Game& game);
+int processingResult(RenderWindow& window, Game& game, int res);
 
 int main()
 {
     FreeConsole();
     RenderWindow window(VideoMode(254 + 15, 290), "MineSweeper", Style::Close);
     window.setKeyRepeatEnabled(false);
-    /*CircleShape shape(200.f);
-    shape.setFillColor(Color::Magenta);*/
+
     Font font;
     font.loadFromFile("Fonts/Calibri.ttf");
 
-    
-
     Game game = Game(1);
     Interface interf;
+    DownDropMenu DDMenu;
 
     Clock gameTimeClock;
     int gameTime = 0;
 
-    Menu(window, game);
-
-    
+    //Menu(window, game);
 
     while (window.isOpen())
     {
@@ -44,28 +41,46 @@ int main()
 
                     }
                 }
-            }
-            else if (event.type == event.MouseButtonPressed && !game.stop()) {
-                if (event.key.code == Mouse::Left) {
-                    Vector2i localPosition = sf::Mouse::getPosition(window);
-                    int px = (localPosition.x - 10) / Cell::size;
-                    int py = (localPosition.y - 81) / Cell::size;
-                    game.OpenCell(py, px);
+                else if (event.key.code == Keyboard::Escape) {
+                    window.close();
                 }
-                else if (event.key.code == Mouse::Right) {
-                    Vector2i localPosition = sf::Mouse::getPosition(window);
-                    int px = (localPosition.x - 10) / Cell::size;
-                    int py = (localPosition.y - 81) / Cell::size;
+            }
+            else if (event.type == event.MouseButtonPressed) {
+                Vector2i mousePos = sf::Mouse::getPosition(window);
+                if (event.key.code == Mouse::Left ) {
+                    if (!game.stop() && !DDMenu.getDDMenuStatus()) {
+                        int px = (mousePos.x - 10) / Cell::size;
+                        int py = (mousePos.y - 81) / Cell::size;
+                        game.OpenCell(py, px);
+                    }
+                    DDMenu.setDDMenuStatus(mousePos.x, mousePos.y);
+                    int res = DDMenu.selectOption(mousePos.x, mousePos.y);
+                    if (processingResult(window, game, res) == 1) {//if new game
+                        gameTimeClock.restart();
+                        gameTime = 0;
+                    }
+                }
+                else if (event.key.code == Mouse::Right && !game.stop() && !DDMenu.getDDMenuStatus()) {
+                    int px = (mousePos.x - 10) / Cell::size;
+                    int py = (mousePos.y - 81) / Cell::size;
                     game.SetSelfStatus(py, px);
                 }
             }
+
+            interf.setSubMenuStatus(Mouse::getPosition(window).x, Mouse::getPosition(window).y);
+            if (DDMenu.getDDMenuStatus())DDMenu.setDDMenuStatus(Mouse::getPosition(window).x, Mouse::getPosition(window).y);
         }
+        
+
         if (game.GetIsGameRun())gameTime = gameTimeClock.getElapsedTime().asSeconds();
         else gameTimeClock.restart();
-        Text timeInGame(to_string(gameTime), font, 18);
+        if (gameTime > 998)game.losing(2);
+
+        Text timeInGame(to_string(999 - gameTime), font, 18);
         timeInGame.setStyle(Text::Bold);
         timeInGame.setFillColor(Color::Red);
-        timeInGame.setPosition(Vector2f(window.getSize().x - 50, 36));
+        timeInGame.setPosition(Vector2f(window.getSize().x - 55, 36));
+
         /*if (Keyboard::isKeyPressed(Keyboard::Key::F2)) {
             window.setSize(Vector2u(274, 224));
             game.newGame(1);
@@ -83,7 +98,7 @@ int main()
         window.draw(interf);
         window.draw(timeInGame);
         window.draw(game);
-
+        window.draw(DDMenu);
         window.display();
     }
 
@@ -185,4 +200,43 @@ int Menu(RenderWindow& window, Game& game) {//0 - nothing have changed, 1 - leve
         window.draw(textExit);
         window.display();
     }
+}
+
+int processingResult(RenderWindow& window, Game& game, int res){
+    if (res == 0) {
+        return 0;
+    }
+    else if (res == 1) {
+        res = 2 + game.GetLevel();
+    }
+    else if (res == 2) {
+        //Open cells algorinhm
+    }
+    
+    if (res == 3) {
+        window.create(VideoMode(254 + 15, 290), "MineSweeper", Style::Close);
+        game.newGame(1);
+        return 1;
+    }
+    else if (res == 4) {
+        window.create(VideoMode(504 + 15, 415), "MineSweeper", Style::Close);
+        game.newGame(2);
+        return 1;
+    }
+    else if (res == 5) {
+        window.create(VideoMode(829 + 15, 590), "MineSweeper", Style::Close);
+        game.newGame(3);
+        return 1;
+    }
+    else if (res == 6) {
+        return Menu(window, game);
+    }
+    else if (res == 7) {
+        return Menu(window, game);
+    }
+    else if (res == 8) {
+        window.close();
+        return 0;
+    }
+
 }

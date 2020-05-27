@@ -25,6 +25,7 @@ Game::Game(int level) : level(level) {//constructor
 }
 
 void Game::newGame(int level) {
+    this->level = level;
     solved = false;
     lose = false;
     isGameRun = false;
@@ -93,7 +94,7 @@ void Game::draw(RenderTarget& target, RenderStates states) const {
     text.setStyle(Text::Bold);
 
     text.setString(std::to_string(countOfMarkes));
-    text.setPosition(Vector2f(65, 36));
+    text.setPosition(Vector2f(62, 36));
     text.setFillColor(Color::Red);
     target.draw(text);
 
