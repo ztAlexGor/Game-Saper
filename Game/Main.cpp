@@ -135,6 +135,17 @@ int Menu(RenderWindow& window, Game& game) {//0 - nothing have changed, 1 - leve
     font.loadFromFile("Fonts/Calibri.ttf");
     Color TextColor(Color::Red);
 
+    TextBox heightInp;
+    heightInp.setPosition(Vector2f(WinSize.x / 2 - 20, WinSize.y / 2 + 26));
+    
+    TextBox widthInp;
+    widthInp.setPosition(Vector2f(WinSize.x / 2 - 20, WinSize.y / 2 + 47));
+
+    TextBox minesInp;
+    minesInp.setPosition(Vector2f(WinSize.x / 2 - 20, WinSize.y / 2 + 68));
+
+    
+
     
     ////text Exit
     //Text textExit(L"бшунд", font, 30);
@@ -222,8 +233,9 @@ int Menu(RenderWindow& window, Game& game) {//0 - nothing have changed, 1 - leve
                     return 1;
                 }
             }
-            
-            
+            heightInp.input(event);
+            widthInp.input(event);
+            minesInp.input(event);
         }
         if (selectLevel == 1 || (mPos == 1 && selectLevel == 0)) {//easy
             isFlag = 1;
@@ -249,8 +261,12 @@ int Menu(RenderWindow& window, Game& game) {//0 - nothing have changed, 1 - leve
             isCancel = 1;
         }
         
+
         window.draw(shape);
         window.draw(Settings);
+        window.draw(heightInp);
+        window.draw(widthInp);
+        window.draw(minesInp);
         if (isOK)window.draw(OK);
         else if (isCancel)window.draw(Cancel);
         if (isFlag)window.draw(Flag);
@@ -298,7 +314,7 @@ int processingResult(RenderWindow& window, Game& game, int res){
 }
 
 
-int mousePosition(int x, int y) {//2 - cancel
+int mousePosition(int x, int y) {
     x += 134;
     y += 145;
 
