@@ -4,6 +4,7 @@ using namespace std;
 
 int Menu(RenderWindow& window, Game& game);
 int processingResult(RenderWindow& window, Game& game, int res);
+int mousePosition(int, int);
 
 int main()
 {
@@ -32,13 +33,9 @@ int main()
                 window.close();
             if (event.type == event.KeyReleased) {
                 if (event.key.code == Keyboard::F1) {
-                    int result = Menu(window, game);
-                    if (result == 2) {
+                    if (Menu(window, game)) {
                         gameTimeClock.restart();
                         gameTime = 0;
-                    }
-                    else if (result == 1) {
-
                     }
                 }
                 else if (event.key.code == Keyboard::Escape) {
@@ -105,99 +102,158 @@ int main()
     return 0;
 }
 
-int Menu(RenderWindow& window, Game& game) {//0 - nothing have changed, 1 - level was restarted, 2 - level has changed
+int Menu(RenderWindow& window, Game& game) {//0 - nothing have changed, 1 - level has changed
+    Vector2u WinSize = window.getSize();
+
+    RectangleShape shape(Vector2f(WinSize.x, WinSize.y));
+    shape.setFillColor(Color(240, 240, 240));
+
+    Texture SettingsIm;
+    SettingsIm.loadFromFile("Images/Settings.png");
+    Sprite Settings;
+    Settings.setTexture(SettingsIm);
+    Settings.setPosition(Vector2f(WinSize.x / 2 - 134, WinSize.y / 2 - 145));
+
+    Texture OKIm;
+    OKIm.loadFromFile("Images/OK.png");
+    Sprite OK;
+    OK.setTexture(OKIm);
+    OK.setPosition(Vector2f(WinSize.x / 2 + 35, WinSize.y / 2 + 115));
+
+    Texture CancelIm;
+    CancelIm.loadFromFile("Images/Cancel.png");
+    Sprite Cancel;
+    Cancel.setTexture(CancelIm);
+    Cancel.setPosition(Vector2f(WinSize.x / 2 - 134, WinSize.y / 2 + 115));
+
+    Texture FlagIm;
+    FlagIm.loadFromFile("Images/Flag.png");
+    Sprite Flag;
+    Flag.setTexture(FlagIm);
+
     Font font;
     font.loadFromFile("Fonts/Calibri.ttf");
     Color TextColor(Color::Red);
 
-    Vector2u WinSize = window.getSize();
-    //text New Game
-    Text textNewGame(L"ÍÎÂÀß ÈÃÐÀ", font, 30);
-    textNewGame.setStyle(Text::Bold);
-    textNewGame.setOrigin(textNewGame.getLocalBounds().width / 2, textNewGame.getLocalBounds().height / 2);
-    textNewGame.setPosition(Vector2f(WinSize.x / 2, WinSize.y / 2 - 50));
+    
+    ////text Exit
+    //Text textExit(L"ÂÛÕÎÄ", font, 30);
+    //textExit.setStyle(Text::Bold);
+    //textExit.setOrigin(textExit.getLocalBounds().width / 2, textExit.getLocalBounds().height / 2);
+    //textExit.setPosition(Vector2f(WinSize.x / 2, WinSize.y / 2 + 50));
 
-    //text Restart Game
-    Text textRestart(L"ÇÀÍÎÂÎ", font, 30);
-    textRestart.setStyle(Text::Bold);
-    textRestart.setOrigin(textRestart.getLocalBounds().width / 2, textRestart.getLocalBounds().height / 2);
-    textRestart.setPosition(Vector2f(WinSize.x / 2, WinSize.y / 2));
+    bool isOK , isCancel;
+    int selectLevel = 0;//0 - not level select, 1 - select type of level, custome level options
+    int isFlag;//0 - if it's not
 
-    //text Exit
-    Text textExit(L"ÂÛÕÎÄ", font, 30);
-    textExit.setStyle(Text::Bold);
-    textExit.setOrigin(textExit.getLocalBounds().width / 2, textExit.getLocalBounds().height / 2);
-    textExit.setPosition(Vector2f(WinSize.x / 2, WinSize.y / 2 + 50));
-
-    int levelMenu = 0;//0 - not level select, 1 - select type of level, custome level options
-
-    while (window.isOpen())
-    {
-        textNewGame.setFillColor(TextColor);
-        textRestart.setFillColor(TextColor);
-        textExit.setFillColor(TextColor);
-
+    while (window.isOpen()){
+        isOK = isCancel = isFlag = 0;
         Event event;
-        while (window.pollEvent(event))
-        {
+
+        Vector2i localPosition = sf::Mouse::getPosition(window);
+        int mPos = mousePosition(localPosition.x - WinSize.x / 2, localPosition.y - WinSize.y / 2);
+
+        while (window.pollEvent(event)){
+
             if (event.type == Event::Closed)
                 window.close();
-
-            else if (event.type == event.MouseButtonPressed) {
+            else if (event.type == event.MouseButtonPressed) {//click left button
                 if (event.key.code == Mouse::Left) {
-                    Vector2i localPosition = sf::Mouse::getPosition(window);
-                    int x = localPosition.x;
-                    int y = localPosition.y;
+                    
 
-                    if (levelMenu == 0) {
-                        if (x > 0 && x < 100 && y>0 && y < 100) {//new game
-
+                    if (mPos == 1) {//easy
+                        if (selectLevel == 1)selectLevel = 0;
+                        else selectLevel = 1;
+                    }
+                    else if (mPos == 2) {//medium
+                        if (selectLevel == 2)selectLevel = 0;
+                        else selectLevel = 2;
+                    }
+                    else if (mPos == 3) {//hard
+                        if (selectLevel == 3)selectLevel = 0;
+                        else selectLevel = 3;
+                    }
+                    else if (mPos == 4) {//custome
+                        if (selectLevel == 4)selectLevel = 0;
+                        else selectLevel = 4;
+                    }
+                    else if (mPos == 5) {//OK
+                        if (selectLevel == 0)return 0;
+                        else if (selectLevel == 1) {
+                            if (game.GetLevel() != 1)window.create(VideoMode(254 + 15, 290), "MineSweeper", Style::Close);
+                            game.newGame(1);
+                            return 1;
                         }
-                        else if (x > 0 && x < 100 && y>0 && y < 100) {//restart
-
+                        else if (selectLevel == 2) {
+                            if (game.GetLevel() != 2)window.create(VideoMode(504 + 15, 415), "MineSweeper", Style::Close);
+                            game.newGame(2);
+                            return 1;
                         }
-                        else if (x > 0 && x < 100 && y>0 && y < 100) {//exit
-
+                        else if (selectLevel == 3) {
+                            if (game.GetLevel() != 3)window.create(VideoMode(829 + 15, 590), "MineSweeper", Style::Close);
+                            game.newGame(3);
+                            return 1;
+                        }
+                        else if (selectLevel == 4) {//need to edit
+                            if (game.GetLevel() != 3)window.create(VideoMode(829 + 15, 590), "MineSweeper", Style::Close);//edit this
+                            game.newGame(3);//edit this
+                            return 1;
                         }
                     }
-                    else if (levelMenu == 1) {//select type of level
-
-                    }
-                    else {//custome level options
-
+                    else if (mPos == 6) {//Cancel
+                        return 0;
                     }
                 }
             }
             if (event.type == event.KeyReleased) {
                 if (event.key.code == Keyboard::F2) {
-                    window.create(VideoMode(254 + 15, 290), "MineSweeper", Style::Close);
+                    if (game.GetLevel() != 1)window.create(VideoMode(254 + 15, 290), "MineSweeper", Style::Close);
                     game.newGame(1);
-                    return 2;
+                    return 1;
                 }
                 else if (event.key.code == Keyboard::F3) {
-                    window.create(VideoMode(504 + 15, 415), "MineSweeper", Style::Close);
+                    if (game.GetLevel() != 2)window.create(VideoMode(504 + 15, 415), "MineSweeper", Style::Close);
                     game.newGame(2);
-                    return 2;
+                    return 1;
                 }
                 else if (event.key.code == Keyboard::F4) {
-                    window.create(VideoMode(829 + 15, 590), "MineSweeper", Style::Close);
+                    if (game.GetLevel() != 3)window.create(VideoMode(829 + 15, 590), "MineSweeper", Style::Close);
                     game.newGame(3);
-                    return 2;
+                    return 1;
                 }
             }
+            
+            
         }
-        // Ðèñóåì ðàìêó èãðîâîãî ïîëÿ
-        RectangleShape shape(Vector2f(WinSize.x, WinSize.y));
-        shape.setOutlineThickness(-4.f);
-        shape.setOutlineColor(Color::Black);
-        shape.setFillColor(Color(15, 140, 9));
-        window.draw(shape);
+        if (selectLevel == 1 || (mPos == 1 && selectLevel == 0)) {//easy
+            isFlag = 1;
+            Flag.setPosition(Vector2f(WinSize.x / 2 - 118, WinSize.y / 2 - 94));//16 51
+        }
+        else if (selectLevel == 2 || (mPos == 2 && selectLevel == 0)) {//medium
+            isFlag = 1;
+            Flag.setPosition(Vector2f(WinSize.x / 2 + 13, WinSize.y / 2 - 94));//147 51
+        }
+        else if (selectLevel == 3 || (mPos == 3 && selectLevel == 0)) {//hard
+            isFlag = 1;
+            Flag.setPosition(Vector2f(WinSize.x / 2 - 53, WinSize.y / 2 - 48));//81 97
+        }
+        else if (selectLevel == 4 || (mPos == 4 && selectLevel == 0)) {//custome level
+            isFlag = 1;
+            Flag.setPosition(Vector2f(WinSize.x / 2 - 118, WinSize.y / 2 + 6));//16 151
+        }
 
+        if (mPos == 5) {//OK
+            isOK = 1;
+        }
+        else if (mPos == 6) {//Cancel
+            isCancel = 1;
+        }
         
-
-        window.draw(textNewGame);
-        window.draw(textRestart);
-        window.draw(textExit);
+        window.draw(shape);
+        window.draw(Settings);
+        if (isOK)window.draw(OK);
+        else if (isCancel)window.draw(Cancel);
+        if (isFlag)window.draw(Flag);
         window.display();
     }
 }
@@ -207,24 +263,24 @@ int processingResult(RenderWindow& window, Game& game, int res){
         return 0;
     }
     else if (res == 1) {
-        res = 2 + game.GetLevel();
+        game.newGame(game.GetLevel());
     }
     else if (res == 2) {
         //Open cells algorinhm
     }
     
     if (res == 3) {
-        window.create(VideoMode(254 + 15, 290), "MineSweeper", Style::Close);
+        if (game.GetLevel() != 1)window.create(VideoMode(254 + 15, 290), "MineSweeper", Style::Close);
         game.newGame(1);
         return 1;
     }
     else if (res == 4) {
-        window.create(VideoMode(504 + 15, 415), "MineSweeper", Style::Close);
+        if (game.GetLevel() != 2)window.create(VideoMode(504 + 15, 415), "MineSweeper", Style::Close);
         game.newGame(2);
         return 1;
     }
     else if (res == 5) {
-        window.create(VideoMode(829 + 15, 590), "MineSweeper", Style::Close);
+        if (game.GetLevel() != 3)window.create(VideoMode(829 + 15, 590), "MineSweeper", Style::Close);
         game.newGame(3);
         return 1;
     }
@@ -239,4 +295,33 @@ int processingResult(RenderWindow& window, Game& game, int res){
         return 0;
     }
 
+}
+
+
+int mousePosition(int x, int y) {//2 - cancel
+    x += 134;
+    y += 145;
+
+
+
+
+    if (x >=12 && x <= 101 && y>=44 && y <=72) {//easy
+        return 1;
+    }
+    else if (x >= 143 && x <= 240 && y >= 44 && y <= 72) {//medium
+        return 2;
+    }
+    else if (x >= 77 && x <= 182 && y >= 89 && y <= 117) {//hard
+        return 3;
+    }
+    else if (x >= 13 && x <= 79 && y >= 149 && y <= 169) {//custome
+        return 4;
+    }
+    else if (x >= 178 && x <= 237 && y >= 262 && y <= 280) {//OK
+        return 5;
+    }
+    else if (x >= 32 && x <= 91 && y > 262 && y < 280) {//Cancel
+        return 6;
+    }
+    return 0;
 }

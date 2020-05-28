@@ -175,8 +175,9 @@ void Game::OpenCell(int x, int y) {
             return;
         }
     }
-    isGameRun = true;
-    ClosedCells -= pole->Open(x, y);
+    int openCount = pole->Open(x, y);
+    if (openCount != 0)isGameRun = true;
+    ClosedCells -= openCount;
     if (ClosedCells == pole->GetMinesCount())win();
 }
 
@@ -203,7 +204,6 @@ void Game::SetSelfStatus(int x, int y) {
         if (a == 1)
             countOfMarkes--;
 }
-
 
 int Game::getCountOfMarks(){
     return countOfMarkes;
