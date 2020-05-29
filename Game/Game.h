@@ -19,10 +19,14 @@ private:
 public:
     Game(int level);
     void newGame(int level);
+    void newGame(int w, int h, int m);
     //Game(const Game& other);
     virtual void draw(RenderTarget& target, RenderStates states)const;
     void OpenCell(int x, int y);
     int GetLevel();
+    int getHeight();
+    int getWidth();
+    int getMines();
     void SetSelfStatus(int x, int y);
     int getCountOfMarks();
     void win();

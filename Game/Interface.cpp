@@ -5,12 +5,14 @@ Interface::Interface(){
 	CountersIm.loadFromFile("Images/Counters.Gif");
     subMenuStatus = 0;
     subMenuStatus = 0;
+    isDDMenu = false;
 }
 
 void Interface::draw(RenderTarget& target, RenderStates states) const{
     Sprite subMenu;
     subMenu.setTexture(subMenuIm);
     subMenu.setTextureRect(sf::IntRect(0, subMenuStatus * 25, 98, 25));
+    if (isDDMenu)subMenu.setTextureRect(sf::IntRect(0, 25, 98, 25));
     //subMenu.setPosition(0, 0);
 
     RectangleShape lineMenu(Vector2f(target.getSize().x, 25));
@@ -47,4 +49,8 @@ void Interface::setSubMenuStatus(int x, int y){
         else if (x >= 42 && x <= 98)subMenuStatus = 2;
         else subMenuStatus = 0;
     }else subMenuStatus = 0;
+}
+
+void Interface::setIsDDMenu(bool arg){
+    isDDMenu = arg;
 }

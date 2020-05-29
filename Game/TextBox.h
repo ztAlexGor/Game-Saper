@@ -8,16 +8,18 @@ class TextBox : public Drawable, public Transformable {
 	Font font;
 	int length;
 	Text input_text;
+	Text default_text;
 	bool isActive;
 	Vector2f position;
 	Vector2f size;
 public:
 	TextBox();
 	bool getIsActive();
-	void input(Event event);
+	bool input(Event event, string(*func)(int, int, int), int, int);
 	void draw(RenderTarget& target, RenderStates states)const;
-	string getText();
+	int getNumber();
 	void setPosition(Vector2f pos);
+	void setDefaulText(string s);
 	void setSize(Vector2f size);
 	Vector2f getSize();
 };

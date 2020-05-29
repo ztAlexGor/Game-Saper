@@ -43,6 +43,17 @@ void Game::newGame(int level) {
     ClosedCells = (pole->GetHeight() * pole->GetWidth());
 }
 
+void Game::newGame(int w, int h, int m){
+    this->level = 4;
+    solved = false;
+    lose = false;
+    isGameRun = false;
+    delete pole;
+    pole = new Field{ h, w, m };//Easy level
+    countOfMarkes = pole->GetMinesCount();
+    ClosedCells = (pole->GetHeight() * pole->GetWidth());
+}
+
 //Game::Game(const Game& other){//copy constructor
 //  this->level = other.level;
 //  this->solved = other.solved;
@@ -185,6 +196,18 @@ int Game::GetLevel() {
     return level;
 }
 
+int Game::getHeight(){
+    return pole->GetHeight();
+}
+
+int Game::getWidth(){
+    return pole->GetWidth();
+}
+
+int Game::getMines(){
+    return pole->GetMinesCount();
+}
+
 Game::~Game() {
     delete pole;
 }
@@ -229,3 +252,4 @@ bool Game::stop() {
     if (solved || lose)return true;
     else return false;
 }
+

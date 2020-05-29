@@ -79,6 +79,7 @@ void DownDropMenu::setDDMenuStatus(int x, int y){//193 195
 			else if (y >= 191 && y <= 216) {//25 
 				DDMenuStatus = 9;
 			}
+			else DDMenuStatus = 1;
 		}
 		else DDMenuStatus = 0;
 	}

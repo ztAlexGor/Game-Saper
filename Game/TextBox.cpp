@@ -1,6 +1,6 @@
 #include "TextBox.h"
 
-
+string checkInput(string);
 
 TextBox::TextBox(){
 	size = Vector2f(90, 16);
@@ -11,13 +11,19 @@ TextBox::TextBox(){
 	input_text.setFillColor(Color::Black);
 	input_text.setCharacterSize(12);
 	input_text.setLetterSpacing(2.5);
+
+	default_text.setFont(font);
+	default_text.setFillColor(Color(100, 100, 100));
+	default_text.setCharacterSize(12);
+	default_text.setLetterSpacing(2.5);
+
 }
 
 bool TextBox::getIsActive(){
 	return isActive;
 }
 
-void TextBox::input(Event event){
+bool TextBox::input(Event event, string (*getCorrectInput)(int, int, int), int x, int y) {
 	if (event.type == Event::MouseButtonReleased) {
 		Vector2f Mpos(event.mouseButton.x, event.mouseButton.y);
 		if (Mpos.x >= position.x && Mpos.x <= position.x + size.x && Mpos.y >= position.y && Mpos.y <= position.y + size.y) {
@@ -25,6 +31,7 @@ void TextBox::input(Event event){
 		}
 		else {
 			isActive = false;
+			if (this->getNumber() != 0)input_text.setString(getCorrectInput(this->getNumber(), x, y));
 		}
 	}
 
@@ -46,11 +53,15 @@ void TextBox::input(Event event){
 			str += sfstr.toAnsiString();
 		}
 
-		if (str.getSize() == 6) return;
+		str = checkInput(str);
 
-		input_text.setString(str);
-		length++;
+		if (str != "0000") {
+			input_text.setString(str);
+			length++;
+			return true;
+		}
 	}
+	return false;
 }
 
 void TextBox::draw(RenderTarget& target, RenderStates states)const {
@@ -63,16 +74,27 @@ void TextBox::draw(RenderTarget& target, RenderStates states)const {
 	else box.setOutlineColor(sf::Color::White);
 
 	target.draw(box);
-	target.draw(input_text);
+	if (input_text.getString() != "0")target.draw(input_text);
+	else target.draw(default_text);
 }
 
-string TextBox::getText(){
-	return input_text.getString();
+int TextBox::getNumber(){
+	int num = 0;
+	string s = input_text.getString();
+	for (int i = 0; i < s.size(); i++) {
+		num *= 10;
+		num += (int)s[i] - 48;
+	}
+	return num;
 }
 
 void TextBox::setPosition(Vector2f pos){
 	position = pos;
 	input_text.setPosition(position + Vector2f(10, 1));
+}
+
+void TextBox::setDefaulText(string s){
+	default_text.setString(s);
 }
 
 void TextBox::setSize(Vector2f size){
@@ -81,4 +103,17 @@ void TextBox::setSize(Vector2f size){
 
 Vector2f TextBox::getSize(){
 	return size;
+}
+
+string checkInput(string s) {
+	if (s.size() > 3)return "0000";
+	for (int i = 0; i < s.size(); i++) {
+		if ((int)s[i] < 48 || (int)s[i]>57)return "0000";
+	}
+	int num = 0;
+	for (int i = 0; i < s.size(); i++) {
+		num *= 10;
+		num += (int)s[i] - 48;
+	}
+	return to_string(num);
 }

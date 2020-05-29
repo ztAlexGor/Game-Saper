@@ -5,11 +5,14 @@ using namespace std;
 int Menu(RenderWindow& window, Game& game);
 int processingResult(RenderWindow& window, Game& game, int res);
 int mousePosition(int, int);
+string getCorrectInputOfHeight(int, int, int);
+string getCorrectInputOfWidth(int, int, int);
+string getCorrectInputOfMines(int, int, int);
 
 int main()
 {
     FreeConsole();
-    RenderWindow window(VideoMode(254 + 15, 290), "MineSweeper", Style::Close);
+    RenderWindow window(VideoMode(10 * Cell::size + 20, 8 * Cell::size + 90), "MineSweeper", Style::Close);
     window.setKeyRepeatEnabled(false);
 
     Font font;
@@ -21,6 +24,7 @@ int main()
 
     Clock gameTimeClock;
     int gameTime = 0;
+    int timeInMenu = 0;
 
     //Menu(window, game);
 
@@ -33,10 +37,12 @@ int main()
                 window.close();
             if (event.type == event.KeyReleased) {
                 if (event.key.code == Keyboard::F1) {
+                    int currTime = gameTimeClock.getElapsedTime().asSeconds();
                     if (Menu(window, game)) {
                         gameTimeClock.restart();
                         gameTime = 0;
-                    }
+                        timeInMenu = 0;
+                    }else timeInMenu += gameTimeClock.getElapsedTime().asSeconds() - currTime;
                 }
                 else if (event.key.code == Keyboard::Escape) {
                     window.close();
@@ -52,10 +58,12 @@ int main()
                     }
                     DDMenu.setDDMenuStatus(mousePos.x, mousePos.y);
                     int res = DDMenu.selectOption(mousePos.x, mousePos.y);
+                    int currTime = gameTimeClock.getElapsedTime().asSeconds();
                     if (processingResult(window, game, res) == 1) {//if new game
                         gameTimeClock.restart();
                         gameTime = 0;
-                    }
+                        timeInMenu = 0;
+                    }else timeInMenu += gameTimeClock.getElapsedTime().asSeconds() - currTime;
                 }
                 else if (event.key.code == Mouse::Right && !game.stop() && !DDMenu.getDDMenuStatus()) {
                     int px = (mousePos.x - 10) / Cell::size;
@@ -65,31 +73,23 @@ int main()
             }
 
             interf.setSubMenuStatus(Mouse::getPosition(window).x, Mouse::getPosition(window).y);
+            interf.setIsDDMenu(DDMenu.getDDMenuStatus());
             if (DDMenu.getDDMenuStatus())DDMenu.setDDMenuStatus(Mouse::getPosition(window).x, Mouse::getPosition(window).y);
         }
         
 
-        if (game.GetIsGameRun())gameTime = gameTimeClock.getElapsedTime().asSeconds();
-        else gameTimeClock.restart();
+        if (game.GetIsGameRun())gameTime = gameTimeClock.getElapsedTime().asSeconds() - timeInMenu;
+        else {
+            gameTimeClock.restart();
+            timeInMenu = 0;
+        }
         if (gameTime > 998)game.losing(2);
+        else if (gameTime < 0)gameTime = 0;
 
         Text timeInGame(to_string(999 - gameTime), font, 18);
         timeInGame.setStyle(Text::Bold);
         timeInGame.setFillColor(Color::Red);
         timeInGame.setPosition(Vector2f(window.getSize().x - 55, 36));
-
-        /*if (Keyboard::isKeyPressed(Keyboard::Key::F2)) {
-            window.setSize(Vector2u(274, 224));
-            game.newGame(1);
-        }
-        else if (Keyboard::isKeyPressed(Keyboard::Key::F3)) {
-            window.setSize(Vector2u(500, 500));
-            game.newGame(2);
-        }
-        else if (Keyboard::isKeyPressed(Keyboard::Key::F4)) {
-            window.setSize(Vector2u(800, 800));
-            game.newGame(3);
-        }*/
         
         window.clear();
         window.draw(interf);
@@ -135,15 +135,18 @@ int Menu(RenderWindow& window, Game& game) {//0 - nothing have changed, 1 - leve
     font.loadFromFile("Fonts/Calibri.ttf");
     Color TextColor(Color::Red);
 
-    TextBox heightInp;
-    heightInp.setPosition(Vector2f(WinSize.x / 2 - 20, WinSize.y / 2 + 26));
-    
+
     TextBox widthInp;
-    widthInp.setPosition(Vector2f(WinSize.x / 2 - 20, WinSize.y / 2 + 47));
+    widthInp.setPosition(Vector2f(WinSize.x / 2 - 20, WinSize.y / 2 + 26));
+    widthInp.setDefaulText("20");
+
+    TextBox heightInp;
+    heightInp.setPosition(Vector2f(WinSize.x / 2 - 20, WinSize.y / 2 + 47));
+    heightInp.setDefaulText("15");
 
     TextBox minesInp;
     minesInp.setPosition(Vector2f(WinSize.x / 2 - 20, WinSize.y / 2 + 68));
-
+    minesInp.setDefaulText("50");
     
 
     
@@ -189,26 +192,29 @@ int Menu(RenderWindow& window, Game& game) {//0 - nothing have changed, 1 - leve
                         else selectLevel = 4;
                     }
                     else if (mPos == 5) {//OK
-                        if (selectLevel == 0)return 0;
+                        if (selectLevel == 0);
                         else if (selectLevel == 1) {
-                            if (game.GetLevel() != 1)window.create(VideoMode(254 + 15, 290), "MineSweeper", Style::Close);
+                            if (game.GetLevel() != 1)window.create(VideoMode(10 * Cell::size + 20, 8 * Cell::size + 90), "MineSweeper", Style::Close);
                             game.newGame(1);
                             return 1;
                         }
                         else if (selectLevel == 2) {
-                            if (game.GetLevel() != 2)window.create(VideoMode(504 + 15, 415), "MineSweeper", Style::Close);
+                            if (game.GetLevel() != 2)window.create(VideoMode(20 * Cell::size + 20, 13 * Cell::size + 90), "MineSweeper", Style::Close);
                             game.newGame(2);
                             return 1;
                         }
                         else if (selectLevel == 3) {
-                            if (game.GetLevel() != 3)window.create(VideoMode(829 + 15, 590), "MineSweeper", Style::Close);
+                            if (game.GetLevel() != 3)window.create(VideoMode(33 * Cell::size + 20, 20 * Cell::size + 90), "MineSweeper", Style::Close);
                             game.newGame(3);
                             return 1;
                         }
-                        else if (selectLevel == 4) {//need to edit
-                            if (game.GetLevel() != 3)window.create(VideoMode(829 + 15, 590), "MineSweeper", Style::Close);//edit this
-                            game.newGame(3);//edit this
-                            return 1;
+                        else if (selectLevel == 4) {
+                            if (widthInp.getNumber() == 0 || heightInp.getNumber() == 0 || minesInp.getNumber() == 0);
+                            else {
+                                window.create(VideoMode(widthInp.getNumber() * Cell::size + 20, heightInp.getNumber() * Cell::size + 90), "MineSweeper", Style::Close);//edit this
+                                game.newGame(widthInp.getNumber(), heightInp.getNumber(), minesInp.getNumber());
+                                return 1;
+                            }
                         }
                     }
                     else if (mPos == 6) {//Cancel
@@ -218,24 +224,25 @@ int Menu(RenderWindow& window, Game& game) {//0 - nothing have changed, 1 - leve
             }
             if (event.type == event.KeyReleased) {
                 if (event.key.code == Keyboard::F2) {
-                    if (game.GetLevel() != 1)window.create(VideoMode(254 + 15, 290), "MineSweeper", Style::Close);
+                    if (game.GetLevel() != 1)window.create(VideoMode(10 * Cell::size + 20, 8 * Cell::size + 90), "MineSweeper", Style::Close);//254 + 15, 290
                     game.newGame(1);
                     return 1;
                 }
                 else if (event.key.code == Keyboard::F3) {
-                    if (game.GetLevel() != 2)window.create(VideoMode(504 + 15, 415), "MineSweeper", Style::Close);
+                    if (game.GetLevel() != 2)window.create(VideoMode(20 * Cell::size + 20, 13 * Cell::size + 90), "MineSweeper", Style::Close);
                     game.newGame(2);
                     return 1;
                 }
                 else if (event.key.code == Keyboard::F4) {
-                    if (game.GetLevel() != 3)window.create(VideoMode(829 + 15, 590), "MineSweeper", Style::Close);
+                    if (game.GetLevel() != 3)window.create(VideoMode(33 * Cell::size + 20, 20 * Cell::size + 90), "MineSweeper", Style::Close);
                     game.newGame(3);
                     return 1;
                 }
             }
-            heightInp.input(event);
-            widthInp.input(event);
-            minesInp.input(event);
+
+            if (heightInp.input(event, getCorrectInputOfHeight, WinSize.x, WinSize.y))selectLevel = 4;
+            if (widthInp.input(event, getCorrectInputOfWidth, WinSize.x, WinSize.y))selectLevel = 4;
+            if (minesInp.input(event, getCorrectInputOfMines, widthInp.getNumber(), heightInp.getNumber()))selectLevel = 4;
         }
         if (selectLevel == 1 || (mPos == 1 && selectLevel == 0)) {//easy
             isFlag = 1;
@@ -279,24 +286,25 @@ int processingResult(RenderWindow& window, Game& game, int res){
         return 0;
     }
     else if (res == 1) {
-        game.newGame(game.GetLevel());
+        game.newGame(game.getWidth(), game.getHeight(), game.getMines());
+        return 1;
     }
     else if (res == 2) {
         //Open cells algorinhm
     }
     
     if (res == 3) {
-        if (game.GetLevel() != 1)window.create(VideoMode(254 + 15, 290), "MineSweeper", Style::Close);
+        if (game.GetLevel() != 1)window.create(VideoMode(10 * Cell::size + 20, 8 * Cell::size + 90), "MineSweeper", Style::Close);
         game.newGame(1);
         return 1;
     }
     else if (res == 4) {
-        if (game.GetLevel() != 2)window.create(VideoMode(504 + 15, 415), "MineSweeper", Style::Close);
+        if (game.GetLevel() != 2)window.create(VideoMode(20 * Cell::size + 20, 13 * Cell::size + 90), "MineSweeper", Style::Close);
         game.newGame(2);
         return 1;
     }
     else if (res == 5) {
-        if (game.GetLevel() != 3)window.create(VideoMode(829 + 15, 590), "MineSweeper", Style::Close);
+        if (game.GetLevel() != 3)window.create(VideoMode(33 * Cell::size + 20, 20 * Cell::size + 90), "MineSweeper", Style::Close);
         game.newGame(3);
         return 1;
     }
@@ -340,4 +348,23 @@ int mousePosition(int x, int y) {
         return 6;
     }
     return 0;
+}
+
+string getCorrectInputOfHeight(int num, int x, int y) {
+    if (num < 8)num = 8;
+    else if (num > 20)num = 20;
+    return to_string(num);
+}
+
+string getCorrectInputOfWidth(int num, int x, int y) {
+    if (num < 10)num = 10;
+    else if (num > 40)num = 40;
+    return to_string(num);
+}
+
+string getCorrectInputOfMines(int num, int x, int y) {
+    if (num < 1)num = 1;
+    else if (num > x*y - 1)num = x * y - 1;
+    if (num < 0)num = 0;
+    return to_string(num);
 }
