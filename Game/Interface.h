@@ -7,6 +7,7 @@ using namespace sf;
 class Interface : public Drawable, public Transformable {
 	Texture subMenuIm;
 	Texture CountersIm;
+	Texture SmileIm;
 	int subMenuStatus;//0 - not active; 1 - active, 2 - 8 sprite activate
 	bool isDDMenu;
 public:
