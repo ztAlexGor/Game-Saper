@@ -351,20 +351,20 @@ int mousePosition(int x, int y) {
 }
 
 string getCorrectInputOfHeight(int num, int x, int y) {
+    if (num > 30 && num > VideoMode::getDesktopMode().height / 25 - 15)num = min(30, num = VideoMode::getDesktopMode().height / 25 - 10);
     if (num < 8)num = 8;
-    else if (num > 20)num = 20;
     return to_string(num);
 }
 
 string getCorrectInputOfWidth(int num, int x, int y) {
+    if (num > 50 && num > VideoMode::getDesktopMode().width / 25 - 15)num = min(50, num = VideoMode::getDesktopMode().width / 25 - 10);
     if (num < 10)num = 10;
-    else if (num > 40)num = 40;
     return to_string(num);
 }
 
 string getCorrectInputOfMines(int num, int x, int y) {
     if (num < 1)num = 1;
-    else if (num > x*y - 1)num = x * y - 1;
+    else if (num > x * y - 1)num = x * y - 1;
     if (num < 0)num = 0;
     return to_string(num);
 }
