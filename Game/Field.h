@@ -10,7 +10,7 @@ class Field {
 	int CalculateMines(int x, int y);
 public:
 	int SetSelfStatus(int x, int y);
-	int Open(int x, int y);
+	int Open(int x, int y, int* countMarks);
 	Field(int h, int w, int countOfMines);
 	int GetHeight();
 	int GetWidth();
@@ -21,12 +21,12 @@ public:
 	void fail(int x, int y);
 	bool DeleteMine(int x, int y);
 	int AutoMark();
-	int AutoOpen();
-	int Guess();
+	int AutoOpen(int* countMarks);
+	int Guess(int* countMarks);
 	int GetCountOfClosed(int x, int y);
 	int GetCountOfMarked(int x, int y);
 	int MarkAll(int x, int y);
-	int OpenAll(int x, int y);
+	int OpenAll(int x, int y, int* countMarks);
 	int IsMarkTrue();
 	~Field();
 };

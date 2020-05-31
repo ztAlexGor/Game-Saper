@@ -4,22 +4,23 @@
 
 
 
-int Field::Open(int x, int y){
+int Field::Open(int x, int y, int* countMarks){
 	if (x < 0 || x >= height || y < 0 || y >= width)return 0;
 	if (cells[x][y]->is_open == 1)return 0;
 
+	if (cells[x][y]->is_open == 2)(*countMarks)++;
 	cells[x][y]->is_open = 1;
 	int col = 1;
 	if (cells[x][y]->number > 0 && cells[x][y]->number < 9)return col;
 
-	if (x > 0 && y > 0)col += Open(x - 1, y - 1);
-	if (x > 0)col += Open(x - 1, y);
-	if (x > 0 && y < width - 1)col += Open(x - 1, y + 1);
-	if (y > 0)col += Open(x, y - 1);
-	if (y < width - 1 )col += Open(x, y + 1);
-	if (x < height - 1 && y > 0)col += Open(x + 1, y - 1);
-	if (x < height - 1)col += Open(x + 1, y);
-	if (x < height - 1 && y < width - 1)col += Open(x + 1, y + 1);
+	if (x > 0 && y > 0)col += Open(x - 1, y - 1, countMarks);
+	if (x > 0)col += Open(x - 1, y, countMarks);
+	if (x > 0 && y < width - 1)col += Open(x - 1, y + 1, countMarks);
+	if (y > 0)col += Open(x, y - 1, countMarks);
+	if (y < width - 1 )col += Open(x, y + 1, countMarks);
+	if (x < height - 1 && y > 0)col += Open(x + 1, y - 1, countMarks);
+	if (x < height - 1)col += Open(x + 1, y, countMarks);
+	if (x < height - 1 && y < width - 1)col += Open(x + 1, y + 1, countMarks);
 	return col;
 }
 
@@ -71,8 +72,8 @@ int Field::GetCellNumber(int x, int y){
 
 int Field::AutoMark() {
 	int count = 0;
-	for (int i = 0; i < width; i++)
-		for (int j = 0; j < height; j++) {
+	for (int i = 0; i < height; i++)
+		for (int j = 0; j < width; j++) {
 			if (cells[i][j]->is_open == 1) {
 				if (cells[i][j]->number == GetCountOfClosed(i, j)) {
 					count += MarkAll(i, j);
@@ -82,41 +83,42 @@ int Field::AutoMark() {
 	return count;
 }
 
-int Field::AutoOpen() {
+int Field::AutoOpen(int* countMarks) {
 	int count = 0;
-	for (int i = 0; i < width; i++)
-		for (int j = 0; j < height; j++) {
+	for (int i = 0; i < height; i++)
+		for (int j = 0; j < width; j++) {
 			if (cells[i][j]->is_open == 1)
 				if (cells[i][j]->number == GetCountOfMarked(i, j)) {
-					count += OpenAll(i, j);
+					count += OpenAll(i, j, countMarks);
 				}
 		}
 	return count;
 }
 
-int Field::Guess() {
-	int x, y, min = 10;
-	for (int i = 0; i < width; i++)
-		for (int j = 0; j < height; j++) {
+int Field::Guess(int* countMarks) {
+	int x = -1, y = -1, min = 10;
+	for (int i = 0; i < height; i++)
+		for (int j = 0; j < width; j++) {
 			if (cells[i][j]->is_open == 0 && cells[i][j]->number != 9 && min > GetCountOfClosed(i,j)) {
 				min = GetCountOfClosed(i, j);
 				x = i;
 				y = j;
 			}
 		}
-	return Open(x, y);
+	if (x == -1 || y == -1)return -1;
+	return this->Open(x, y, countMarks);
 }
 
 int Field::GetCountOfClosed(int x, int y) {
 	int count = 0;
-	if (x > 0 && y > 0 && cells[x - 1][y - 1]->is_open == 0)count++;
-	if (x > 0 && cells[x - 1][y]->is_open == 0)count++;
-	if (x > 0 && y < width - 1 && cells[x - 1][y + 1]->is_open == 0)count++;
-	if (y > 0 && cells[x][y - 1]->is_open == 0)count++;
-	if (y < width - 1 && cells[x][y + 1]->is_open == 0)count++;
-	if (x < height - 1 && y > 0 && cells[x + 1][y - 1]->is_open == 0)count++;
-	if (x < height - 1 && cells[x + 1][y]->is_open == 0)count++;
-	if (x < height - 1 && y < width - 1 && cells[x + 1][y + 1]->is_open == 0)count++;
+	if (x > 0 && y > 0 && cells[x - 1][y - 1]->is_open != 1)count++;
+	if (x > 0 && cells[x - 1][y]->is_open != 1)count++;
+	if (x > 0 && y < width - 1 && cells[x - 1][y + 1]->is_open != 1)count++;
+	if (y > 0 && cells[x][y - 1]->is_open != 1)count++;
+	if (y < width - 1 && cells[x][y + 1]->is_open != 1)count++;
+	if (x < height - 1 && y > 0 && cells[x + 1][y - 1]->is_open != 1)count++;
+	if (x < height - 1 && cells[x + 1][y]->is_open != 1)count++;
+	if (x < height - 1 && y < width - 1 && cells[x + 1][y + 1]->is_open != 1)count++;
 	return count;
 }
 
@@ -140,36 +142,35 @@ int Field::MarkAll(int x, int y) {
 	if (x > 0 && y < width - 1 && cells[x - 1][y + 1]->is_open == 0) { cells[x - 1][y + 1]->is_open = 2; count++; }
 	if (y > 0 && cells[x][y - 1]->is_open == 0) { cells[x][y - 1]->is_open = 2; count++; }
 	if (y < width - 1 && cells[x][y + 1]->is_open == 0) { cells[x][y + 1]->is_open = 2; count++; }
-	if (x < height - 1 && y > 0 && cells[x + 1][y - 1]->is_open == 0) { cells[x + 1][y - 1]->is_open = 2; count; }
+	if (x < height - 1 && y > 0 && cells[x + 1][y - 1]->is_open == 0) { cells[x + 1][y - 1]->is_open = 2; count++; }
 	if (x < height - 1 && cells[x + 1][y]->is_open == 0) { cells[x + 1][y]->is_open = 2; count++; }
 	if (x < height - 1 && y < width - 1 && cells[x + 1][y + 1]->is_open == 0) { cells[x + 1][y + 1]->is_open = 2; count++; }
 	return count;
 }
 
-int Field::OpenAll(int x, int y) {
+int Field::OpenAll(int x, int y, int* countMarks) {
 	int count = 0;
-	if (x > 0 && y > 0 && cells[x - 1][y - 1]->is_open == 0) count += Open(x - 1, y - 1);
-	if (x > 0 && cells[x - 1][y]->is_open == 0)Open(x - 1, y);
-	if (x > 0 && y < width - 1 && cells[x - 1][y + 1]->is_open == 0) count += Open(x - 1, y + 1);
-	if (y > 0 && cells[x][y - 1]->is_open == 0) count += Open(x, y - 1);
-	if (y < width - 1 && cells[x][y + 1]->is_open == 0) count += Open(x, y + 1);
-	if (x < height - 1 && y > 0 && cells[x + 1][y - 1]->is_open == 0) count += Open(x + 1, y - 1);
-	if (x < height - 1 && cells[x + 1][y]->is_open == 0) count += Open(x + 1, y);
-	if (x < height - 1 && y < width - 1 && cells[x + 1][y + 1]->is_open == 0) count += Open(x + 1, y + 1);
+	if (x > 0 && y > 0 && cells[x - 1][y - 1]->is_open != 2) count += Open(x - 1, y - 1, countMarks);
+	if (x > 0 && cells[x - 1][y]->is_open != 2)Open(x - 1, y, countMarks);
+	if (x > 0 && y < width - 1 && cells[x - 1][y + 1]->is_open != 2) count += Open(x - 1, y + 1, countMarks);
+	if (y > 0 && cells[x][y - 1]->is_open != 2) count += Open(x, y - 1, countMarks);
+	if (y < width - 1 && cells[x][y + 1]->is_open != 2) count += Open(x, y + 1, countMarks);
+	if (x < height - 1 && y > 0 && cells[x + 1][y - 1]->is_open != 2) count += Open(x + 1, y - 1, countMarks);
+	if (x < height - 1 && cells[x + 1][y]->is_open != 2) count += Open(x + 1, y, countMarks);
+	if (x < height - 1 && y < width - 1 && cells[x + 1][y + 1]->is_open != 2) count += Open(x + 1, y + 1, countMarks);
 	return count;
 }
 
 int Field::IsMarkTrue() {
 	int count = 0;
-	for (int i = 0; i < width; i++)
-		for (int j = 0; j < height; j++)
+	for (int i = 0; i < height; i++)
+		for (int j = 0; j < width; j++)
 			if (cells[i][j]->is_open == 2 && cells[i][j]->number != 9) {
 				cells[i][j]->is_open = 0;
 				count++;
 			}
 	return count;
 }
-
 
 Field::~Field(){
 	for (int i = 0; i < height; i++) {
@@ -206,6 +207,7 @@ int Field::SetSelfStatus(int x, int y) {
 		}
 	return 2;
 }
+
 int Field::GetMinesCount() {
 	return countOfMines;
 }

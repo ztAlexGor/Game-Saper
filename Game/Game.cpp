@@ -186,7 +186,7 @@ void Game::OpenCell(int x, int y) {
             return;
         }
     }
-    int openCount = pole->Open(x, y);
+    int openCount = pole->Open(x, y, &countOfMarkes);
     if (openCount != 0)isGameRun = true;
     ClosedCells -= openCount;
     if (ClosedCells == pole->GetMinesCount())win();
@@ -232,17 +232,19 @@ int Game::getCountOfMarks(){
     return countOfMarkes;
 }
 
-void Game::AutoSolve() {
+bool Game::AutoSolve() {
     int count = pole->AutoMark();
     this->countOfMarkes -= count;
     if (count == 0) {
-        count = pole->AutoOpen();
+        count = pole->AutoOpen(&countOfMarkes);
         this->ClosedCells -= count;
     }
     if (count == 0) {
-        count = pole->Guess();
+        count = pole->Guess(&countOfMarkes);
         this->ClosedCells -= count;
     }
+    if (count == -1)return 0;
+    return 1;
 }
 
 void Game::IsMarkTrue() {
