@@ -26,6 +26,7 @@ int main()
     int gameTime = 0;
     int timeInMenu = 0;
 
+    bool isAutoSolve = 0;
     //Menu(window, game);
 
     while (window.isOpen())
@@ -42,7 +43,9 @@ int main()
                         gameTimeClock.restart();
                         gameTime = 0;
                         timeInMenu = 0;
-                    }else timeInMenu += gameTimeClock.getElapsedTime().asSeconds() - currTime;
+                        isAutoSolve = 0;
+                    }
+                    else timeInMenu += gameTimeClock.getElapsedTime().asSeconds() - currTime;
                 }
                 else if (event.key.code == Keyboard::Escape) {
                     window.close();
@@ -50,25 +53,39 @@ int main()
             }
             else if (event.type == event.MouseButtonPressed) {
                 Vector2i mousePos = sf::Mouse::getPosition(window);
-                if (event.key.code == Mouse::Left ) {
-                    if (!game.stop() && !DDMenu.getDDMenuStatus()) {
-                        int px = (mousePos.x - 10) / Cell::size;
-                        int py = (mousePos.y - 81) / Cell::size;
-                        game.OpenCell(py, px);
+                if (event.key.code == Mouse::Left) {
+                    if (!game.stop() && !DDMenu.getDDMenuStatus() && !isAutoSolve) {
+                        if (mousePos.x >= 10 && mousePos.y >= 81) {
+                            int px = (mousePos.x - 10) / Cell::size;
+                            int py = (mousePos.y - 81) / Cell::size;
+                            game.OpenCell(py, px);
+                        }
                     }
                     DDMenu.setDDMenuStatus(mousePos.x, mousePos.y);
                     int res = DDMenu.selectOption(mousePos.x, mousePos.y);
                     int currTime = gameTimeClock.getElapsedTime().asSeconds();
-                    if (processingResult(window, game, res) == 1) {//if new game
+                    res = processingResult(window, game, res);
+                    if (res == 1) {//if new game
                         gameTimeClock.restart();
                         gameTime = 0;
                         timeInMenu = 0;
-                    }else timeInMenu += gameTimeClock.getElapsedTime().asSeconds() - currTime;
+                        isAutoSolve = 0;
+                    }
+                    else if (res == 2) {//if auto resolve
+                        timeInMenu += gameTimeClock.getElapsedTime().asSeconds() - currTime;
+                        if (!isAutoSolve) {
+                            isAutoSolve = true;
+                            //game.IsMarkTrue();
+                        }
+                    }
+                    else timeInMenu += gameTimeClock.getElapsedTime().asSeconds() - currTime;
                 }
-                else if (event.key.code == Mouse::Right && !game.stop() && !DDMenu.getDDMenuStatus()) {
-                    int px = (mousePos.x - 10) / Cell::size;
-                    int py = (mousePos.y - 81) / Cell::size;
-                    game.SetSelfStatus(py, px);
+                else if (event.key.code == Mouse::Right && !game.stop() && !DDMenu.getDDMenuStatus() && !isAutoSolve) {
+                    if (mousePos.x >= 10 && mousePos.y >= 81) {
+                        int px = (mousePos.x - 10) / Cell::size;
+                        int py = (mousePos.y - 81) / Cell::size;
+                        game.SetSelfStatus(py, px);
+                    }
                 }
             }
 
@@ -76,21 +93,20 @@ int main()
             interf.setIsDDMenu(DDMenu.getDDMenuStatus());
             if (DDMenu.getDDMenuStatus())DDMenu.setDDMenuStatus(Mouse::getPosition(window).x, Mouse::getPosition(window).y);
         }
-        
 
-        if (game.GetIsGameRun())gameTime = gameTimeClock.getElapsedTime().asSeconds() - timeInMenu;
+
+        if (game.GetIsGameRun() && !isAutoSolve)gameTime = gameTimeClock.getElapsedTime().asSeconds() - timeInMenu;
         else {
             gameTimeClock.restart();
             timeInMenu = 0;
         }
         if (gameTime > 998)game.losing(2);
         else if (gameTime < 0)gameTime = 0;
-
         Text timeInGame(to_string(999 - gameTime), font, 18);
         timeInGame.setStyle(Text::Bold);
         timeInGame.setFillColor(Color::Red);
         timeInGame.setPosition(Vector2f(window.getSize().x - 55, 36));
-        
+
         window.clear();
         window.draw(interf);
         window.draw(timeInGame);
