@@ -69,6 +69,107 @@ int Field::GetCellNumber(int x, int y){
 	return cells[x][y]->number;
 }
 
+int Field::AutoMark() {
+	int count = 0;
+	for (int i = 0; i < width; i++)
+		for (int j = 0; j < height; j++) {
+			if (cells[i][j]->is_open == 1) {
+				if (cells[i][j]->number == GetCountOfClosed(i, j)) {
+					count += MarkAll(i, j);
+				}
+			}
+		}
+	return count;
+}
+
+int Field::AutoOpen() {
+	int count = 0;
+	for (int i = 0; i < width; i++)
+		for (int j = 0; j < height; j++) {
+			if (cells[i][j]->is_open == 1)
+				if (cells[i][j]->number == GetCountOfMarked(i, j)) {
+					count += OpenAll(i, j);
+				}
+		}
+	return count;
+}
+
+int Field::Guess() {
+	int x, y, min = 10;
+	for (int i = 0; i < width; i++)
+		for (int j = 0; j < height; j++) {
+			if (cells[i][j]->is_open == 0 && cells[i][j]->number != 9 && min > GetCountOfClosed(i,j)) {
+				min = GetCountOfClosed(i, j);
+				x = i;
+				y = j;
+			}
+		}
+	return Open(x, y);
+}
+
+int Field::GetCountOfClosed(int x, int y) {
+	int count = 0;
+	if (x > 0 && y > 0 && cells[x - 1][y - 1]->is_open == 0)count++;
+	if (x > 0 && cells[x - 1][y]->is_open == 0)count++;
+	if (x > 0 && y < width - 1 && cells[x - 1][y + 1]->is_open == 0)count++;
+	if (y > 0 && cells[x][y - 1]->is_open == 0)count++;
+	if (y < width - 1 && cells[x][y + 1]->is_open == 0)count++;
+	if (x < height - 1 && y > 0 && cells[x + 1][y - 1]->is_open == 0)count++;
+	if (x < height - 1 && cells[x + 1][y]->is_open == 0)count++;
+	if (x < height - 1 && y < width - 1 && cells[x + 1][y + 1]->is_open == 0)count++;
+	return count;
+}
+
+int Field::GetCountOfMarked(int x, int y) {
+	int count = 0;
+	if (x > 0 && y > 0 && cells[x - 1][y - 1]->is_open == 2)count++;
+	if (x > 0 && cells[x - 1][y]->is_open == 2)count++;
+	if (x > 0 && y < width - 1 && cells[x - 1][y + 1]->is_open == 2)count++;
+	if (y > 0 && cells[x][y - 1]->is_open == 2)count++;
+	if (y < width - 1 && cells[x][y + 1]->is_open == 2)count++;
+	if (x < height - 1 && y > 0 && cells[x + 1][y - 1]->is_open == 2)count++;
+	if (x < height - 1 && cells[x + 1][y]->is_open == 2)count++;
+	if (x < height - 1 && y < width - 1 && cells[x + 1][y + 1]->is_open == 2)count++;
+	return count;
+}
+
+int Field::MarkAll(int x, int y) {
+	int count = 0;
+	if (x > 0 && y > 0 && cells[x - 1][y - 1]->is_open == 0) { cells[x - 1][y - 1]->is_open = 2; count++;}
+	if (x > 0 && cells[x - 1][y]->is_open == 0){cells[x - 1][y]->is_open = 2; count++;}
+	if (x > 0 && y < width - 1 && cells[x - 1][y + 1]->is_open == 0) { cells[x - 1][y + 1]->is_open = 2; count++; }
+	if (y > 0 && cells[x][y - 1]->is_open == 0) { cells[x][y - 1]->is_open = 2; count++; }
+	if (y < width - 1 && cells[x][y + 1]->is_open == 0) { cells[x][y + 1]->is_open = 2; count++; }
+	if (x < height - 1 && y > 0 && cells[x + 1][y - 1]->is_open == 0) { cells[x + 1][y - 1]->is_open = 2; count; }
+	if (x < height - 1 && cells[x + 1][y]->is_open == 0) { cells[x + 1][y]->is_open = 2; count++; }
+	if (x < height - 1 && y < width - 1 && cells[x + 1][y + 1]->is_open == 0) { cells[x + 1][y + 1]->is_open = 2; count++; }
+	return count;
+}
+
+int Field::OpenAll(int x, int y) {
+	int count = 0;
+	if (x > 0 && y > 0 && cells[x - 1][y - 1]->is_open == 0) count += Open(x - 1, y - 1);
+	if (x > 0 && cells[x - 1][y]->is_open == 0)Open(x - 1, y);
+	if (x > 0 && y < width - 1 && cells[x - 1][y + 1]->is_open == 0) count += Open(x - 1, y + 1);
+	if (y > 0 && cells[x][y - 1]->is_open == 0) count += Open(x, y - 1);
+	if (y < width - 1 && cells[x][y + 1]->is_open == 0) count += Open(x, y + 1);
+	if (x < height - 1 && y > 0 && cells[x + 1][y - 1]->is_open == 0) count += Open(x + 1, y - 1);
+	if (x < height - 1 && cells[x + 1][y]->is_open == 0) count += Open(x + 1, y);
+	if (x < height - 1 && y < width - 1 && cells[x + 1][y + 1]->is_open == 0) count += Open(x + 1, y + 1);
+	return count;
+}
+
+int Field::IsMarkTrue() {
+	int count = 0;
+	for (int i = 0; i < width; i++)
+		for (int j = 0; j < height; j++)
+			if (cells[i][j]->is_open == 2 && cells[i][j]->number != 9) {
+				cells[i][j]->is_open = 0;
+				count++;
+			}
+	return count;
+}
+
 
 Field::~Field(){
 	for (int i = 0; i < height; i++) {

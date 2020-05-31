@@ -232,6 +232,23 @@ int Game::getCountOfMarks(){
     return countOfMarkes;
 }
 
+void Game::AutoSolve() {
+    int count = pole->AutoMark();
+    this->countOfMarkes -= count;
+    if (count == 0) {
+        count = pole->AutoOpen();
+        this->ClosedCells -= count;
+    }
+    if (count == 0) {
+        count = pole->Guess();
+        this->ClosedCells -= count;
+    }
+}
+
+void Game::IsMarkTrue() {
+    countOfMarkes += pole->IsMarkTrue();
+}
+
 void Game::win(){
     solved = true;
     isGameRun = false;

@@ -34,5 +34,7 @@ public:
     void losing(int reason);//reason = 0 if player open the bomd and 1 if all time is waste
     bool GetIsGameRun();
     bool stop();
+    void AutoSolve();
+    void IsMarkTrue();
     ~Game();
 };

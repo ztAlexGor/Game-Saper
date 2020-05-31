@@ -20,5 +20,13 @@ public:
 	void win();
 	void fail(int x, int y);
 	bool DeleteMine(int x, int y);
+	int AutoMark();
+	int AutoOpen();
+	int Guess();
+	int GetCountOfClosed(int x, int y);
+	int GetCountOfMarked(int x, int y);
+	int MarkAll(int x, int y);
+	int OpenAll(int x, int y);
+	int IsMarkTrue();
 	~Field();
 };
