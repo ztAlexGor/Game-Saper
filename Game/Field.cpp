@@ -95,7 +95,7 @@ int Field::AutoOpen() {
 }
 
 int Field::Guess() {
-	int x, y, min;
+	int x, y, min = 10;
 	for (int i = 0; i < width; i++)
 		for (int j = 0; j < height; j++) {
 			if (cells[i][j]->is_open == 0 && cells[i][j]->number != 9 && min > GetCountOfClosed(i,j)) {
