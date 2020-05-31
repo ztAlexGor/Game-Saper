@@ -25,9 +25,11 @@ int main()
     Clock gameTimeClock;
     int gameTime = 0;
     int timeInMenu = 0;
-    int lastTime = 0;
+    long long lastTime = 0;
+    int speed = 10;
 
     bool isAutoSolve = 0;
+
     //Menu(window, game);
 
     while (window.isOpen())
@@ -51,6 +53,14 @@ int main()
                 else if (event.key.code == Keyboard::Escape) {
                     window.close();
                 }
+                else if (event.key.code == Keyboard::Add) {
+                    speed--;
+                    if (speed < 2)speed = 2;
+                }
+                else if (event.key.code == Keyboard::Subtract) {
+                    speed++;
+                    if (speed > 40)speed = 40;
+                }
             }
             else if (event.type == event.MouseButtonPressed) {
                 Vector2i mousePos = Mouse::getPosition(window);
@@ -64,7 +74,7 @@ int main()
                     }
                     DDMenu.setDDMenuStatus(mousePos.x, mousePos.y);
                     int res = DDMenu.selectOption(mousePos.x, mousePos.y);
-                    int currTime = gameTimeClock.getElapsedTime().asSeconds();
+                    long long currTime = gameTimeClock.getElapsedTime().asSeconds();
                     res = processingResult(window, game, res);
                     if (mousePos.x > window.getSize().x / 2 - 12 && mousePos.x < window.getSize().x / 2 + 13 && mousePos.y > 36 && mousePos.y < 61)res = processingResult(window, game, 1);
                     if (res == 1) {//if new game
@@ -78,6 +88,7 @@ int main()
                         timeInMenu += gameTimeClock.getElapsedTime().asSeconds() - currTime;
                         if (!isAutoSolve) {
                             isAutoSolve = true;
+                            speed = 10;
                             game.IsMarkTrue();
                         }
                     }
@@ -98,8 +109,8 @@ int main()
         }
         
         if (isAutoSolve) {//Auto solve
-            int currTime = gameTimeClock.getElapsedTime().asSeconds();
-            if (currTime > lastTime) {
+            int currTime = gameTimeClock.getElapsedTime().asMilliseconds();
+            if (currTime > lastTime + speed * 50) {
                 if (!game.AutoSolve()) {
                     isAutoSolve = 0;
                     game.win();

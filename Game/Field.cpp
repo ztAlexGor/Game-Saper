@@ -24,8 +24,6 @@ int Field::Open(int x, int y, int* countMarks){
 	return col;
 }
 
-
-
 Field::Field(int h, int w, int mines) : height(h), width(w), countOfMines(mines) {
 	srand(time(NULL));
 	cells = new Cell * *[height];
