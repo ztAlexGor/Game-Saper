@@ -3,7 +3,7 @@
 Interface::Interface(){
 	subMenuIm.loadFromFile("Images/subMenu.Gif");
 	CountersIm.loadFromFile("Images/Counters.Gif");
-    SmileIm.loadFromFile("Images/Smile.Gif");
+    RestartIm.loadFromFile("Images/Restart.png");
     subMenuStatus = 0;
     subMenuStatus = 0;
     isDDMenu = false;
@@ -31,10 +31,10 @@ void Interface::draw(RenderTarget& target, RenderStates states) const{
     Counters.setPosition(20, 31);
     Counters.setTextureRect(IntRect(0, 0, 80, 33));
 
-    Sprite Smile;
-    Smile.setTexture(SmileIm);
-    Smile.setPosition(target.getSize().x / 2 - 12, 36);
-    Smile.setTextureRect(IntRect(0, 0, 25, 25));
+    Sprite Restart;
+    Restart.setTexture(RestartIm);
+    Restart.setPosition(target.getSize().x / 2 - 16, 31);
+    Restart.setTextureRect(IntRect(0, 0, 33, 33));
 
 
     target.draw(fon);
@@ -43,7 +43,7 @@ void Interface::draw(RenderTarget& target, RenderStates states) const{
     Counters.setTextureRect(IntRect(80, 0, 80, 33));
     Counters.setPosition(target.getSize().x - 100, 31);
     target.draw(Counters);
-    target.draw(Smile);
+    target.draw(Restart);
     target.draw(subMenu);
     target.draw(underMenuLine);
     underMenuLine.setPosition(0, 71);

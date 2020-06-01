@@ -27,13 +27,17 @@ int main()
     int timeInMenu = 0;
     long long lastTime = 0;
     int speed = 10;
-
     bool isAutoSolve = 0;
 
+    Text timeInGame(to_string(999 - gameTime), font, 18);
+    timeInGame.setStyle(Text::Bold);
+    timeInGame.setFillColor(Color::Red);
+    timeInGame.setPosition(Vector2f(window.getSize().x - 55, 36));
     //Menu(window, game);
 
     while (window.isOpen())
     {
+        bool isNewLevel = 0;
         Event event;
         while (window.pollEvent(event))
         {
@@ -43,12 +47,23 @@ int main()
                 if (event.key.code == Keyboard::F1) {
                     int currTime = gameTimeClock.getElapsedTime().asSeconds();
                     if (Menu(window, game)) {
-                        gameTimeClock.restart();
-                        gameTime = 0;
-                        timeInMenu = 0;
-                        isAutoSolve = 0;
-                        lastTime = 0;
+                        isNewLevel = 1;
                     }else timeInMenu += gameTimeClock.getElapsedTime().asSeconds() - currTime;
+                }
+                else if (event.key.code == Keyboard::F2) {
+                    if (game.GetLevel() != 1)window.create(VideoMode(10 * Cell::size + 20, 8 * Cell::size + 90), "MineSweeper", Style::Close);//254 + 15, 290
+                    game.newGame(1);
+                    isNewLevel = 1;
+                }
+                else if (event.key.code == Keyboard::F3) {
+                    if (game.GetLevel() != 2)window.create(VideoMode(20 * Cell::size + 20, 13 * Cell::size + 90), "MineSweeper", Style::Close);
+                    game.newGame(2);
+                    isNewLevel = 1;
+                }
+                else if (event.key.code == Keyboard::F4) {
+                    if (game.GetLevel() != 3)window.create(VideoMode(33 * Cell::size + 20, 20 * Cell::size + 90), "MineSweeper", Style::Close);
+                    game.newGame(3);
+                    isNewLevel = 1;
                 }
                 else if (event.key.code == Keyboard::Escape) {
                     window.close();
@@ -76,13 +91,9 @@ int main()
                     int res = DDMenu.selectOption(mousePos.x, mousePos.y);
                     long long currTime = gameTimeClock.getElapsedTime().asSeconds();
                     res = processingResult(window, game, res);
-                    if (mousePos.x > window.getSize().x / 2 - 12 && mousePos.x < window.getSize().x / 2 + 13 && mousePos.y > 36 && mousePos.y < 61)res = processingResult(window, game, 1);
+                    if (mousePos.x >= window.getSize().x / 2 - 16 && mousePos.x <= window.getSize().x / 2 + 17 && mousePos.y >= 31 && mousePos.y <= 64)res = processingResult(window, game, 1);
                     if (res == 1) {//if new game
-                        gameTimeClock.restart();
-                        gameTime = 0;
-                        timeInMenu = 0;
-                        isAutoSolve = 0;
-                        lastTime = 0;
+                        isNewLevel = 1;
                     }
                     else if (res == 2) {//start auto resolve
                         timeInMenu += gameTimeClock.getElapsedTime().asSeconds() - currTime;
@@ -119,6 +130,15 @@ int main()
             }
         }
 
+        if (isNewLevel) {
+            gameTimeClock.restart();
+            gameTime = 0;
+            timeInMenu = 0;
+            isAutoSolve = 0;
+            lastTime = 0;
+            timeInGame.setPosition(Vector2f(window.getSize().x - 55, 36));
+        }
+
         if (game.GetIsGameRun() && !isAutoSolve) {//time calculating
             gameTime = gameTimeClock.getElapsedTime().asSeconds() - timeInMenu;
             if (gameTime > 998)game.losing(2);
@@ -126,10 +146,7 @@ int main()
         }
         else if(!isAutoSolve)gameTimeClock.restart();
 
-        Text timeInGame(to_string(999 - gameTime), font, 18);
-        timeInGame.setStyle(Text::Bold);
-        timeInGame.setFillColor(Color::Red);
-        timeInGame.setPosition(Vector2f(window.getSize().x - 55, 36));
+        timeInGame.setString(to_string(999 - gameTime));
         
 
 
@@ -353,9 +370,6 @@ int processingResult(RenderWindow& window, Game& game, int res){
         return Menu(window, game);
     }
     else if (res == 7) {
-        return Menu(window, game);
-    }
-    else if (res == 8) {
         window.close();
         return 0;
     }

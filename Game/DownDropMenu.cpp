@@ -73,11 +73,8 @@ void DownDropMenu::setDDMenuStatus(int x, int y){//193 195
 			else if (y >= 141 && y <= 162) {//21
 				DDMenuStatus = 7;
 			}
-			else if (y >= 165 && y <= 189) {//24
+			else if (y >= 165 && y <= 187) {//24
 				DDMenuStatus = 8;
-			}
-			else if (y >= 191 && y <= 216) {//25 
-				DDMenuStatus = 9;
 			}
 			else DDMenuStatus = 1;
 		}
@@ -97,7 +94,7 @@ void DownDropMenu::draw(RenderTarget& target, RenderStates states) const{
 	DDMenu.setPosition(1, 23);
 
 	if (DDMenuStatus) {
-		DDMenu.setTextureRect(IntRect((DDMenuStatus - 1) * 193, 0, 193, 195));
+		DDMenu.setTextureRect(IntRect((DDMenuStatus - 1) * 193, 0, 193, 168));
 		target.draw(DDMenu);
 	}
 }
