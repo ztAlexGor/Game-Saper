@@ -92,6 +92,9 @@ int main()
                     long long currTime = gameTimeClock.getElapsedTime().asSeconds();
                     res = processingResult(window, game, res);
                     if (mousePos.x >= window.getSize().x / 2 - 16 && mousePos.x <= window.getSize().x / 2 + 17 && mousePos.y >= 31 && mousePos.y <= 64)res = processingResult(window, game, 1);
+                    else if (mousePos.x >= 42 && mousePos.x <= 98 && mousePos.y >= 0 && mousePos.y <= 25) {
+                        ShellExecute(0, 0, L"Index1.mhtml", 0, 0, SW_SHOW);
+                    }
                     if (res == 1) {//if new game
                         isNewLevel = 1;
                     }
