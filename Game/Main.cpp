@@ -33,7 +33,6 @@ int main()
     timeInGame.setStyle(Text::Bold);
     timeInGame.setFillColor(Color::Red);
     timeInGame.setPosition(Vector2f(window.getSize().x - 55, 36));
-    //Menu(window, game);
 
     while (window.isOpen())
     {
@@ -210,13 +209,6 @@ int Menu(RenderWindow& window, Game& game) {//0 - nothing have changed, 1 - leve
     minesInp.setPosition(Vector2f(WinSize.x / 2 - 20, WinSize.y / 2 + 68));
     minesInp.setDefaulText("50");
     
-    
-    
-    ////text Exit
-    //Text textExit(L"бшунд", font, 30);
-    //textExit.setStyle(Text::Bold);
-    //textExit.setOrigin(textExit.getLocalBounds().width / 2, textExit.getLocalBounds().height / 2);
-    //textExit.setPosition(Vector2f(WinSize.x / 2, WinSize.y / 2 + 50));
 
     bool isOK , isCancel;
     int selectLevel = 0;//0 - not level select, 1 - select type of level, custome level options

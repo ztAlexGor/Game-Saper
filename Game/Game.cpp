@@ -73,32 +73,6 @@ void Game::draw(RenderTarget& target, RenderStates states) const {
     Color color = Color(127, 127, 127);
 
 
-    // Рисуем рамку игрового поля
-   /* RectangleShape shape(Vector2f(pole->GetWidth() * Cell::size, pole->GetHeight() * Cell::size + 50.f));
-    shape.setOutlineThickness(2.f);
-    shape.setOutlineColor(color);
-    shape.setFillColor(Color(139, 250, 131));
-    target.draw(shape, states);*/
-
-    // Рисуем меню игрового поля
-    /*shape.setSize(Vector2f(pole->GetWidth() * Cell::size, 40.f));
-    shape.setOutlineThickness(2.f);
-    shape.setOutlineColor(color);
-    shape.setFillColor(Color::Transparent);
-    target.draw(shape, states);*/
-
-   /* shape.setSize(Vector2f(pole->GetWidth() * Cell::size - 2, pole->GetHeight() * Cell::size - 2));
-    shape.setPosition(Vector2f(10, 50));
-    shape.setOutlineThickness(6.f);
-    shape.setOutlineColor(Color(70, 70, 70));
-    target.draw(shape, states);*/
-
-    //// Подготавливаем рамку для отрисовки всех клеточек
-    //shape.setSize(Vector2f(Cell::size - 2, Cell::size - 2));
-    //shape.setOutlineThickness(2.f);
-    //shape.setOutlineColor(color);
-    //shape.setFillColor(Color::Transparent);
-
     // Подготавливаем текстовую заготовку для отрисовки чисел в клеточках
 
     Text text("", font, 18);
@@ -125,13 +99,7 @@ void Game::draw(RenderTarget& target, RenderStates states) const {
                     if (lose) {
                         Cell.setTextureRect(sf::IntRect(75, 0, 25, 25));
                     }
-                    //else {//
-                    //    text.setFillColor(Color::Black);
-                    //    text.setString(std::to_string(count));
-                    //}
                 }
-                //else if (count == 0)text.setString("");//
-                //else text.setString(std::to_string(count));//
             }
             else if (pole->GetCellStatus(i, j) == 1) {//Уже открытая клеточка
                 Cell.setTextureRect(sf::IntRect(25, 0, 25, 25));
@@ -159,16 +127,16 @@ void Game::draw(RenderTarget& target, RenderStates states) const {
         }
     }
     if (solved) {
-        Text winText("YOU WON!!!", font, 50);
+        Text winText(L"ПОБЕДА", font, 50);
         winText.setStyle(Text::Bold);
-        winText.setPosition(Vector2f(pole->GetWidth() * Cell::size / 2 - 110, pole->GetHeight() * Cell::size / 2 + 56));
+        winText.setPosition(Vector2f(target.getSize().x / 2 - winText.getString().getSize() * 15, target.getSize().y / 2));
         winText.setFillColor(Color(22, 114, 50));
         target.draw(winText);
     }
     else if (lose) {
-        Text loseText("YOU LOSE :(", font, 40);
+        Text loseText(L"ПОРАЖЕНИЕ", font, 40);
         loseText.setStyle(Text::Bold);
-        loseText.setPosition(Vector2f(pole->GetWidth() * Cell::size / 2 - 80, pole->GetHeight() * Cell::size / 2 + 56));
+        loseText.setPosition(Vector2f(target.getSize().x / 2 - loseText.getString().getSize() * 12, target.getSize().y / 2));
         loseText.setFillColor(Color(255, 0, 0));
         target.draw(loseText);
     }
