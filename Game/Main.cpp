@@ -263,12 +263,13 @@ int Menu(RenderWindow& window, Game& game) {//0 - nothing have changed, 1 - leve
                             return 1;
                         }
                         else if (selectLevel == 4) {
-                            if (widthInp.getNumber() == 0 || heightInp.getNumber() == 0 || minesInp.getNumber() == 0);
-                            else {
-                                window.create(VideoMode(widthInp.getNumber() * Cell::size + 20, heightInp.getNumber() * Cell::size + 90), "MineSweeper", Style::Close);//edit this
-                                game.newGame(widthInp.getNumber(), heightInp.getNumber(), minesInp.getNumber());
-                                return 1;
-                            }
+                            int h = heightInp.getNumber(), w = widthInp.getNumber(), m = minesInp.getNumber();
+                            if (h == 0)h = 15;
+                            if (w == 0)w = 20;
+                            if (m == 0)m = 50;
+                            window.create(VideoMode(w * Cell::size + 20, h * Cell::size + 90), "MineSweeper", Style::Close);//edit this
+                            game.newGame(w, h, m);
+                            return 1;
                         }
                     }
                     else if (mPos == 6) {//Cancel

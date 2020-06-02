@@ -20,6 +20,7 @@ public:
 	int getNumber();
 	void setPosition(Vector2f pos);
 	void setDefaulText(string s);
+	string getDefaulText();
 	void setSize(Vector2f size);
 	Vector2f getSize();
 };

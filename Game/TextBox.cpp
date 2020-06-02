@@ -13,7 +13,7 @@ TextBox::TextBox(){
 	input_text.setLetterSpacing(2.5);
 
 	default_text.setFont(font);
-	default_text.setFillColor(Color(100, 100, 100));
+	default_text.setFillColor(Color(160, 160, 160));
 	default_text.setCharacterSize(12);
 	default_text.setLetterSpacing(2.5);
 
@@ -74,7 +74,7 @@ void TextBox::draw(RenderTarget& target, RenderStates states)const {
 	else box.setOutlineColor(sf::Color::White);
 
 	target.draw(box);
-	if (input_text.getString() != "0")target.draw(input_text);
+	if (input_text.getString() != "0" && input_text.getString() != "")target.draw(input_text);
 	else target.draw(default_text);
 }
 
@@ -91,10 +91,15 @@ int TextBox::getNumber(){
 void TextBox::setPosition(Vector2f pos){
 	position = pos;
 	input_text.setPosition(position + Vector2f(10, 1));
+	default_text.setPosition(position + Vector2f(10, 1));
 }
 
 void TextBox::setDefaulText(string s){
 	default_text.setString(s);
+}
+
+string TextBox::getDefaulText() {
+	return default_text.getString();
 }
 
 void TextBox::setSize(Vector2f size){
