@@ -28,5 +28,7 @@ public:
 	int MarkAll(int x, int y);
 	int OpenAll(int x, int y, int* countMarks);
 	int IsMarkTrue();
+	float GetProb(int x, int y);
+	float CountProb(int x, int y);
 	~Field();
 };

@@ -1,6 +1,7 @@
 #include "Field.h"
 #include <ctime>
 #include <iomanip>
+#include <vector>
 
 
 
@@ -94,17 +95,77 @@ int Field::AutoOpen(int* countMarks) {
 }
 
 int Field::Guess(int* countMarks) {
-	int x = -1, y = -1, min = 10;
-	for (int i = 0; i < height; i++)
+	int i_min = rand() % height, j_min = rand() % width;
+	float min = 2;
+	for (int i = 0; i < height; i++) {
 		for (int j = 0; j < width; j++) {
-			if (cells[i][j]->is_open == 0 && cells[i][j]->number != 9 && min > GetCountOfClosed(i,j)) {
-				min = GetCountOfClosed(i, j);
-				x = i;
-				y = j;
+			if (cells[i][j]->is_open == 0) {
+				float prob = GetProb(i, j);
+				if (prob != -1) {
+					if (prob < min && cells[i][j]->number != 9) {
+						i_min = i;
+						j_min = j;
+						min = prob;
+					}
+				}
 			}
 		}
-	if (x == -1 || y == -1)return -1;
-	return this->Open(x, y, countMarks);
+	}
+	if (min == 2) {
+		if (cells[0][0]->is_open == 0) {
+			int x_rand = rand() % height, y_rand = rand() % width;
+			if (cells[x_rand][y_rand]->number == 9) {
+				DeleteMine(x_rand, y_rand);
+			}
+			return Open(x_rand, y_rand, countMarks);
+		}
+		return -1;
+	}
+	return Open(i_min, j_min, countMarks);
+	
+}
+
+float Field::GetProb(int x, int y) {
+	float probs[8]{ -1 , -1, -1, -1, -1, -1, -1, -1 };
+	if (x > 0 && y > 0 && cells[x - 1][y - 1]->is_open == 1) {
+		probs[0] = CountProb(x - 1, y - 1);
+	}
+	if (x > 0 && cells[x - 1][y]->is_open == 1) {
+		probs[1] = CountProb(x - 1, y);
+	}
+	if (x > 0 && y < width - 1 && cells[x - 1][y + 1]->is_open == 1) {
+		probs[2] = CountProb(x - 1, y + 1);
+	}
+	if (y > 0 && cells[x][y - 1]->is_open == 1) {
+		probs[3] = CountProb(x, y - 1);
+	}
+	if (y < width - 1 && cells[x][y + 1]->is_open == 1) {
+		probs[4] = CountProb(x, y + 1);
+	}
+	if (x < height - 1 && y > 0 && cells[x + 1][y - 1]->is_open == 1) {
+		probs[5] = CountProb(x + 1, y - 1);
+	}
+	if (x < height - 1 && cells[x + 1][y]->is_open == 1) {
+		probs[6] = CountProb(x + 1, y);
+	}
+	if (x < height - 1 && y < width - 1 && cells[x + 1][y + 1]->is_open == 1) {
+		probs[7] = CountProb(x + 1, y + 1);
+	}
+	bool is = false;
+	float mult = 1;
+	for (int i = 0; i < 8; i++)
+		if (probs[i] != -1) {
+			mult *= (1 - probs[i]);
+			is = true;
+		}
+	if (is)
+		return 1 - mult;
+	return -1;
+}
+
+float Field::CountProb(int x, int y) {
+	int marks = GetCountOfMarked(x, y);
+	return ((float)(cells[x][y]->number - marks)) / ((float)(GetCountOfClosed(x, y) - marks));
 }
 
 int Field::GetCountOfClosed(int x, int y) {
