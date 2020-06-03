@@ -209,9 +209,9 @@ bool Game::AutoSolve() {
     }
     if (count == 0) {
         count = pole->Guess(&countOfMarkes);
+        if (count == -1)return 0;
         this->ClosedCells -= count;
     }
-    if (count == -1)return 0;
     return 1;
 }
 

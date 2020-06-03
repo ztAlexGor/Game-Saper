@@ -9,159 +9,159 @@ string getCorrectInputOfHeight(int, int, int);
 string getCorrectInputOfWidth(int, int, int);
 string getCorrectInputOfMines(int, int, int);
 
-int main()
-{
-    FreeConsole();
-    RenderWindow window(VideoMode(10 * Cell::size + 20, 8 * Cell::size + 90), "MineSweeper", Style::Close);
-    window.setKeyRepeatEnabled(false);
-
-    Font font;
-    font.loadFromFile("Fonts/Calibri.ttf");
-
-    Game game = Game(1);
-    Interface interf;
-    DownDropMenu DDMenu;
-
-    Clock gameTimeClock;
-    int gameTime = 0;
-    int timeInMenu = 0;
-    long long lastTime = 0;
-    int speed = 10;
-    bool isAutoSolve = 0;
-
-    Text timeInGame(to_string(999 - gameTime), font, 18);
-    timeInGame.setStyle(Text::Bold);
-    timeInGame.setFillColor(Color::Red);
-    timeInGame.setPosition(Vector2f(window.getSize().x - 55, 36));
-
-    while (window.isOpen())
+    int main()
     {
-        bool isNewLevel = 0;
-        Event event;
-        while (window.pollEvent(event))
+        FreeConsole();
+        RenderWindow window(VideoMode(10 * Cell::size + 20, 8 * Cell::size + 90), "MineSweeper", Style::Close);
+        window.setKeyRepeatEnabled(false);
+
+        Font font;
+        font.loadFromFile("Fonts/Calibri.ttf");
+
+        Game game = Game(1);
+        Interface interf;
+        DownDropMenu DDMenu;
+
+        Clock gameTimeClock;
+        int gameTime = 0;
+        int timeInMenu = 0;
+        long long lastTime = 0;
+        int speed = 10;
+        bool isAutoSolve = 0;
+
+        Text timeInGame(to_string(999 - gameTime), font, 18);
+        timeInGame.setStyle(Text::Bold);
+        timeInGame.setFillColor(Color::Red);
+        timeInGame.setPosition(Vector2f(window.getSize().x - 55, 36));
+
+        while (window.isOpen())
         {
-            if (event.type == Event::Closed)
-                window.close();
-            if (event.type == event.KeyReleased) {
-                if (event.key.code == Keyboard::F1) {
-                    int currTime = gameTimeClock.getElapsedTime().asSeconds();
-                    if (Menu(window, game)) {
-                        isNewLevel = 1;
-                    }else timeInMenu += gameTimeClock.getElapsedTime().asSeconds() - currTime;
-                }
-                else if (event.key.code == Keyboard::F2) {
-                    if (game.GetLevel() != 1)window.create(VideoMode(10 * Cell::size + 20, 8 * Cell::size + 90), "MineSweeper", Style::Close);//254 + 15, 290
-                    game.newGame(1);
-                    isNewLevel = 1;
-                }
-                else if (event.key.code == Keyboard::F3) {
-                    if (game.GetLevel() != 2)window.create(VideoMode(20 * Cell::size + 20, 13 * Cell::size + 90), "MineSweeper", Style::Close);
-                    game.newGame(2);
-                    isNewLevel = 1;
-                }
-                else if (event.key.code == Keyboard::F4) {
-                    if (game.GetLevel() != 3)window.create(VideoMode(33 * Cell::size + 20, 20 * Cell::size + 90), "MineSweeper", Style::Close);
-                    game.newGame(3);
-                    isNewLevel = 1;
-                }
-                else if (event.key.code == Keyboard::Escape) {
+            bool isNewLevel = 0;
+            Event event;
+            while (window.pollEvent(event))
+            {
+                if (event.type == Event::Closed)
                     window.close();
+                if (event.type == event.KeyReleased) {
+                    if (event.key.code == Keyboard::F1) {
+                        int currTime = gameTimeClock.getElapsedTime().asSeconds();
+                        if (Menu(window, game)) {
+                            isNewLevel = 1;
+                        }else timeInMenu += gameTimeClock.getElapsedTime().asSeconds() - currTime;
+                    }
+                    else if (event.key.code == Keyboard::F2) {
+                        if (game.GetLevel() != 1)window.create(VideoMode(10 * Cell::size + 20, 8 * Cell::size + 90), "MineSweeper", Style::Close);//254 + 15, 290
+                        game.newGame(1);
+                        isNewLevel = 1;
+                    }
+                    else if (event.key.code == Keyboard::F3) {
+                        if (game.GetLevel() != 2)window.create(VideoMode(20 * Cell::size + 20, 13 * Cell::size + 90), "MineSweeper", Style::Close);
+                        game.newGame(2);
+                        isNewLevel = 1;
+                    }
+                    else if (event.key.code == Keyboard::F4) {
+                        if (game.GetLevel() != 3)window.create(VideoMode(33 * Cell::size + 20, 20 * Cell::size + 90), "MineSweeper", Style::Close);
+                        game.newGame(3);
+                        isNewLevel = 1;
+                    }
+                    else if (event.key.code == Keyboard::Escape) {
+                        window.close();
+                    }
+                    else if (event.key.code == Keyboard::Add) {
+                        speed--;
+                        if (speed < 2)speed = 2;
+                    }
+                    else if (event.key.code == Keyboard::Subtract) {
+                        speed++;
+                        if (speed > 40)speed = 40;
+                    }
                 }
-                else if (event.key.code == Keyboard::Add) {
-                    speed--;
-                    if (speed < 2)speed = 2;
-                }
-                else if (event.key.code == Keyboard::Subtract) {
-                    speed++;
-                    if (speed > 40)speed = 40;
-                }
-            }
-            else if (event.type == event.MouseButtonPressed) {
-                Vector2i mousePos = Mouse::getPosition(window);
-                if (event.key.code == Mouse::Left ) {
-                    if (!game.stop() && !DDMenu.getDDMenuStatus() && !isAutoSolve) {
+                else if (event.type == event.MouseButtonPressed) {
+                    Vector2i mousePos = Mouse::getPosition(window);
+                    if (event.key.code == Mouse::Left ) {
+                        if (!game.stop() && !DDMenu.getDDMenuStatus() && !isAutoSolve) {
+                            if (mousePos.x >= 10 && mousePos.y >= 81) {
+                                int px = (mousePos.x - 10) / Cell::size;
+                                int py = (mousePos.y - 81) / Cell::size;
+                                game.OpenCell(py, px);
+                            }
+                        }
+                        DDMenu.setDDMenuStatus(mousePos.x, mousePos.y);
+                        int res = DDMenu.selectOption(mousePos.x, mousePos.y);
+                        long long currTime = gameTimeClock.getElapsedTime().asSeconds();
+                        res = processingResult(window, game, res);
+                        if (mousePos.x >= window.getSize().x / 2 - 16 && mousePos.x <= window.getSize().x / 2 + 17 && mousePos.y >= 31 && mousePos.y <= 64)res = processingResult(window, game, 1);
+                        else if (mousePos.x >= 42 && mousePos.x <= 98 && mousePos.y >= 0 && mousePos.y <= 25) {
+                            ShellExecute(0, 0, L"Index1.mhtml", 0, 0, SW_SHOW);
+                        }
+                        if (res == 1) {//if new game
+                            isNewLevel = 1;
+                        }
+                        else if (res == 2) {//start auto resolve
+                            timeInMenu += gameTimeClock.getElapsedTime().asSeconds() - currTime;
+                            if (!isAutoSolve && !game.stop()) {
+                                isAutoSolve = true;
+                                speed = 10;
+                                game.IsMarkTrue();
+                            }
+                        }
+                        else timeInMenu += gameTimeClock.getElapsedTime().asSeconds() - currTime;
+                    }
+                    else if (event.key.code == Mouse::Right && !game.stop() && !DDMenu.getDDMenuStatus() && !isAutoSolve) {
                         if (mousePos.x >= 10 && mousePos.y >= 81) {
                             int px = (mousePos.x - 10) / Cell::size;
                             int py = (mousePos.y - 81) / Cell::size;
-                            game.OpenCell(py, px);
+                            game.SetSelfStatus(py, px);
                         }
                     }
-                    DDMenu.setDDMenuStatus(mousePos.x, mousePos.y);
-                    int res = DDMenu.selectOption(mousePos.x, mousePos.y);
-                    long long currTime = gameTimeClock.getElapsedTime().asSeconds();
-                    res = processingResult(window, game, res);
-                    if (mousePos.x >= window.getSize().x / 2 - 16 && mousePos.x <= window.getSize().x / 2 + 17 && mousePos.y >= 31 && mousePos.y <= 64)res = processingResult(window, game, 1);
-                    else if (mousePos.x >= 42 && mousePos.x <= 98 && mousePos.y >= 0 && mousePos.y <= 25) {
-                        ShellExecute(0, 0, L"Index1.mhtml", 0, 0, SW_SHOW);
-                    }
-                    if (res == 1) {//if new game
-                        isNewLevel = 1;
-                    }
-                    else if (res == 2) {//start auto resolve
-                        timeInMenu += gameTimeClock.getElapsedTime().asSeconds() - currTime;
-                        if (!isAutoSolve) {
-                            isAutoSolve = true;
-                            speed = 10;
-                            game.IsMarkTrue();
-                        }
-                    }
-                    else timeInMenu += gameTimeClock.getElapsedTime().asSeconds() - currTime;
                 }
-                else if (event.key.code == Mouse::Right && !game.stop() && !DDMenu.getDDMenuStatus() && !isAutoSolve) {
-                    if (mousePos.x >= 10 && mousePos.y >= 81) {
-                        int px = (mousePos.x - 10) / Cell::size;
-                        int py = (mousePos.y - 81) / Cell::size;
-                        game.SetSelfStatus(py, px);
+
+                interf.setSubMenuStatus(Mouse::getPosition(window).x, Mouse::getPosition(window).y);
+                interf.setIsDDMenu(DDMenu.getDDMenuStatus());
+                if (DDMenu.getDDMenuStatus())DDMenu.setDDMenuStatus(Mouse::getPosition(window).x, Mouse::getPosition(window).y);
+            }
+        
+            if (isAutoSolve) {//Auto solve
+                int currTime = gameTimeClock.getElapsedTime().asMilliseconds();
+                if (currTime > lastTime + speed * 50) {
+                    if (!game.AutoSolve()) {
+                        isAutoSolve = 0;
+                        game.win();
                     }
+                    lastTime = currTime;
                 }
             }
 
-            interf.setSubMenuStatus(Mouse::getPosition(window).x, Mouse::getPosition(window).y);
-            interf.setIsDDMenu(DDMenu.getDDMenuStatus());
-            if (DDMenu.getDDMenuStatus())DDMenu.setDDMenuStatus(Mouse::getPosition(window).x, Mouse::getPosition(window).y);
-        }
-        
-        if (isAutoSolve) {//Auto solve
-            int currTime = gameTimeClock.getElapsedTime().asMilliseconds();
-            if (currTime > lastTime + speed * 50) {
-                if (!game.AutoSolve()) {
-                    isAutoSolve = 0;
-                    game.win();
-                }
-                lastTime = currTime;
+            if (isNewLevel) {
+                gameTimeClock.restart();
+                gameTime = 0;
+                timeInMenu = 0;
+                isAutoSolve = 0;
+                lastTime = 0;
+                timeInGame.setPosition(Vector2f(window.getSize().x - 55, 36));
             }
-        }
 
-        if (isNewLevel) {
-            gameTimeClock.restart();
-            gameTime = 0;
-            timeInMenu = 0;
-            isAutoSolve = 0;
-            lastTime = 0;
-            timeInGame.setPosition(Vector2f(window.getSize().x - 55, 36));
-        }
+            if (game.GetIsGameRun() && !isAutoSolve) {//time calculating
+                gameTime = gameTimeClock.getElapsedTime().asSeconds() - timeInMenu;
+                if (gameTime > 998)game.losing(2);
+                else if (gameTime < 0)gameTime = 0;
+            }
+            else if(!isAutoSolve)gameTimeClock.restart();
 
-        if (game.GetIsGameRun() && !isAutoSolve) {//time calculating
-            gameTime = gameTimeClock.getElapsedTime().asSeconds() - timeInMenu;
-            if (gameTime > 998)game.losing(2);
-            else if (gameTime < 0)gameTime = 0;
-        }
-        else if(!isAutoSolve)gameTimeClock.restart();
-
-        timeInGame.setString(to_string(999 - gameTime));
+            timeInGame.setString(to_string(999 - gameTime));
         
 
 
-        window.clear();
-        window.draw(interf);
-        window.draw(timeInGame);
-        window.draw(game);
-        window.draw(DDMenu);
-        window.display();
+            window.clear();
+            window.draw(interf);
+            window.draw(timeInGame);
+            window.draw(game);
+            window.draw(DDMenu);
+            window.display();
+        }
+
+        return 0;
     }
-
-    return 0;
-}
 
 int Menu(RenderWindow& window, Game& game) {//0 - nothing have changed, 1 - level has changed
     Vector2u WinSize = window.getSize();
